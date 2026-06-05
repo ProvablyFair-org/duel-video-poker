@@ -1,0 +1,23 @@
+{
+  "source": "GET https://duel.com/api/v2/video-poker/config",
+  "captured_at": "2026-04-23",
+  "variant": "Jacks or Better",
+  "multipliers": {
+    "royal_flush": 812.9719437907615,
+    "straight_flush": 58,
+    "four_of_a_kind": 26,
+    "full_house": 9,
+    "flush": 6,
+    "straight": 4,
+    "three_of_a_kind": 3,
+    "two_pair": 2,
+    "jacks_or_better": 1,
+    "none": 0
+  },
+  "notes": [
+    "Single variant — no risk levels, no alternative pay tables.",
+    "Royal Flush multiplier 812.9719437907615 is slightly higher than standard 9/6 Jacks or Better (800x).",
+    "'Zero Edge' is marketing: the 0.1% optimal-play house edge is implemented by the pay-table itself — the boosted royal_flush multiplier (812.97x vs the standard 9/6 800x) plus elevated straight_flush/four_of_a_kind multipliers lift the optimal-play RTP to exactly 99.9000%, vs 99.5439% for the standard 9/6 Jacks or Better baseline. The separate 'effective_edge' field in the bet response is the operator-side zero_edge_rakeback mechanism that refunds the 0.1% on top — not the source of the 99.9000%.",
+    "'none' = losing hand (no pair of Jacks or better, no better combination)."
+  ]
+}

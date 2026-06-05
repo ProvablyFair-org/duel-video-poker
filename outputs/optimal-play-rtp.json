@@ -1,0 +1,177 @@
+{
+  "generatedAt": "2026-06-03T15:49:59.965Z",
+  "totalHands": 2598960,
+  "crossValidation": {
+    "payTable": {
+      "royal_flush": 800,
+      "straight_flush": 50,
+      "four_of_a_kind": 25,
+      "full_house": 9,
+      "flush": 6,
+      "straight": 4,
+      "three_of_a_kind": 3,
+      "two_pair": 2,
+      "jacks_or_better": 1,
+      "none": 0
+    },
+    "rtp": 0.9954390436979867,
+    "rtpPercent": "99.543904",
+    "target": 0.995439,
+    "tolerance": 0.000001,
+    "pass": true,
+    "elapsed": 53.353,
+    "canonicalClasses": 134459
+  },
+  "duel": {
+    "payTable": {
+      "royal_flush": 812.9719437907615,
+      "straight_flush": 58,
+      "four_of_a_kind": 26,
+      "full_house": 9,
+      "flush": 6,
+      "straight": 4,
+      "three_of_a_kind": 3,
+      "two_pair": 2,
+      "jacks_or_better": 1,
+      "none": 0
+    },
+    "payTableHash": "9daedc8fc7a53e328d50b5e8019c177b32d5bf7992494a7da18136f524a70542",
+    "rtp": 0.9990000000028132,
+    "rtpPercent": "99.900000",
+    "elapsed": 52.227,
+    "canonicalClasses": 134459,
+    "classSummary": {
+      "totalClasses": 134459,
+      "holdDistribution": {
+        "0": 84360,
+        "1": 403968,
+        "2": 1651440,
+        "3": 148392,
+        "4": 291312,
+        "5": 19488
+      }
+    },
+    "topClasses": [
+      {
+        "key": "0,1,2,4,10",
+        "count": 24,
+        "optimalEV": 4.345050878815911,
+        "optimalHoldCount": 3
+      },
+      {
+        "key": "0,1,2,4,13",
+        "count": 24,
+        "optimalEV": 4.345050878815911,
+        "optimalHoldCount": 3
+      },
+      {
+        "key": "0,1,2,4,17",
+        "count": 24,
+        "optimalEV": 4.345050878815911,
+        "optimalHoldCount": 3
+      },
+      {
+        "key": "0,1,2,4,21",
+        "count": 24,
+        "optimalEV": 4.345050878815911,
+        "optimalHoldCount": 3
+      },
+      {
+        "key": "0,1,2,4,25",
+        "count": 24,
+        "optimalEV": 4.345050878815911,
+        "optimalHoldCount": 3
+      },
+      {
+        "key": "0,1,2,4,29",
+        "count": 24,
+        "optimalEV": 4.345050878815911,
+        "optimalHoldCount": 3
+      },
+      {
+        "key": "0,1,2,4,33",
+        "count": 24,
+        "optimalEV": 4.345050878815911,
+        "optimalHoldCount": 3
+      },
+      {
+        "key": "0,1,2,4,37",
+        "count": 24,
+        "optimalEV": 4.345050878815911,
+        "optimalHoldCount": 3
+      },
+      {
+        "key": "0,1,2,4,41",
+        "count": 24,
+        "optimalEV": 4.345050878815911,
+        "optimalHoldCount": 3
+      },
+      {
+        "key": "0,1,2,4,45",
+        "count": 24,
+        "optimalEV": 4.345050878815911,
+        "optimalHoldCount": 3
+      },
+      {
+        "key": "0,1,2,4,49",
+        "count": 24,
+        "optimalEV": 4.345050878815911,
+        "optimalHoldCount": 3
+      },
+      {
+        "key": "0,1,2,10,12",
+        "count": 24,
+        "optimalEV": 4.345050878815911,
+        "optimalHoldCount": 3
+      },
+      {
+        "key": "0,1,2,10,16",
+        "count": 24,
+        "optimalEV": 4.345050878815911,
+        "optimalHoldCount": 3
+      },
+      {
+        "key": "0,1,2,10,20",
+        "count": 24,
+        "optimalEV": 4.345050878815911,
+        "optimalHoldCount": 3
+      },
+      {
+        "key": "0,1,2,10,24",
+        "count": 24,
+        "optimalEV": 4.345050878815911,
+        "optimalHoldCount": 3
+      },
+      {
+        "key": "0,1,2,10,28",
+        "count": 24,
+        "optimalEV": 4.345050878815911,
+        "optimalHoldCount": 3
+      },
+      {
+        "key": "0,1,2,10,32",
+        "count": 24,
+        "optimalEV": 4.345050878815911,
+        "optimalHoldCount": 3
+      },
+      {
+        "key": "0,1,2,10,36",
+        "count": 24,
+        "optimalEV": 4.345050878815911,
+        "optimalHoldCount": 3
+      },
+      {
+        "key": "0,1,2,10,40",
+        "count": 24,
+        "optimalEV": 4.345050878815911,
+        "optimalHoldCount": 3
+      },
+      {
+        "key": "0,1,2,10,44",
+        "count": 24,
+        "optimalEV": 4.345050878815911,
+        "optimalHoldCount": 3
+      }
+    ]
+  }
+}

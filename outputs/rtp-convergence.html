@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DUEL VIDEO POKER — 10M SIMULATED ROUNDS</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #fafafa; color: #333; padding: 24px; }
+  .container { max-width: 1100px; margin: 0 auto; background: #fff; border-radius: 12px; border: 1px solid #e0e0e0; padding: 32px; }
+  .chart-wrap { position: relative; height: 420px; margin-bottom: 24px; }
+  h1   { text-align: center; font-size: 16px; font-weight: 600; color: #333; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px; }
+  h2   { text-align: center; font-size: 14px; color: #666; margin-top: 40px; margin-bottom: 8px; }
+  .box { background: #fff; padding: 14px; border: 1px solid #e0e0e0; border-radius: 8px; margin: 10px auto; max-width: 900px; }
+  .note { text-align: center; font-size: 11px; color: #999; margin: 6px 0; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>DUEL VIDEO POKER — DEAL-ONLY RTP CONVERGENCE</h1>
+<p class="note">10 streams x 1M = 10M rounds | Fisher's method | Confirms deck shuffle is unbiased</p>
+<div class="chart-wrap"><canvas id="convergence"></canvas></div>
+
+<div class="box">
+  <p><b>Final empirical RTP (deal-only):</b> 33.6999%</p>
+  <p><b>Theoretical RTP (deal-only):</b> 33.7238%</p>
+  <p><b>Deviation:</b> -0.0710%</p>
+  <p><b>Fisher's combined p-value:</b> 0.798239 (T=14.61, df=20)</p>
+  <p><b>Serial independence failures:</b> 0</p>
+  <p><b>Optimal-play RTP:</b> 99.9000% (exact, exhaustive C(52,5) enumeration — see optimal-play-rtp.json)</p>
+</div>
+
+<h2>HAND-RANK DISTRIBUTION — OBSERVED vs THEORETICAL</h2>
+<p class="note">10M simulated deals | Expected counts from C(52,5) = 2,598,960 combinatorial probabilities</p>
+<div class="chart-wrap"><canvas id="distribution"></canvas></div>
+
+<script>
+// Chart 1: RTP Convergence
+new Chart(document.getElementById('convergence'), {
+  type: 'line',
+  data: {
+    labels: ["1,000","5,000","10,000","50,000","100,000","500,000","1,000,000","2,000,000","5,000,000","10,000,000"],
+    datasets: [
+      { label: 'Empirical RTP', data: [0.389,0.3512,0.3429,0.33334,0.33222,0.33905788777516305,0.33778291583137227,0.3386679018032676,0.3372037438875815,0.33699865791568606], borderColor: '#1565c0', fill: false, tension: 0.15, pointRadius: 3 },
+      { label: 'Theoretical RTP', data: [0.3372379289312506,0.3372379289312506,0.3372379289312506,0.3372379289312506,0.3372379289312506,0.3372379289312506,0.3372379289312506,0.3372379289312506,0.3372379289312506,0.3372379289312506], borderColor: '#e57373', borderDash: [5, 5], fill: false, pointRadius: 0 },
+    ],
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      y: { ticks: { color: '#666', callback: v => (v * 100).toFixed(2) + '%' }, grid: { color: '#e0e0e0' } },
+      x: { ticks: { color: '#666' }, grid: { color: '#e0e0e0' } },
+    },
+    plugins: { legend: { labels: { color: '#333' } } },
+  },
+});
+
+// Chart 2: Hand-Rank Distribution Bar Chart
+new Chart(document.getElementById('distribution'), {
+  type: 'bar',
+  data: {
+    labels: ["royal flush","straight flush","four of a kind","full house","flush","straight","three of a kind","two pair","jacks or better","none"],
+    datasets: [
+      { label: 'Observed', data: [15,128,2431,14375,19439,39653,210806,474827,1300469,7937857], backgroundColor: 'rgba(21, 101, 192, 0.6)', borderColor: '#1565c0', borderWidth: 1 },
+      { label: 'Expected', data: [15,139,2401,14406,19654,39246,211285,475390,1300212,7937252], backgroundColor: 'rgba(229, 115, 115, 0.4)', borderColor: '#e57373', borderWidth: 1, borderDash: [3, 3] },
+    ],
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      y: {
+        type: 'logarithmic',
+        ticks: { color: '#666', callback: function(v) { return Number(v).toLocaleString(); } },
+        grid: { color: '#e0e0e0' },
+        title: { display: true, text: 'Count (log scale)', color: '#666' },
+      },
+      x: { ticks: { color: '#666', maxRotation: 45 }, grid: { color: '#e0e0e0' } },
+    },
+    plugins: {
+      legend: { labels: { color: '#333' } },
+      tooltip: {
+        callbacks: {
+          afterLabel: function(ctx) {
+            const obs = [15,128,2431,14375,19439,39653,210806,474827,1300469,7937857];
+            const exp = [15.390771693292702,138.5169452396343,2400.9603841536614,14405.762304921967,19654.01545233478,39246.46781789639,211284.5138055222,475390.156062425,1300212.3926493675,7937251.823806446];
+            const i = ctx.dataIndex;
+            const ratio = (obs[i] / exp[i] * 100).toFixed(2);
+            return 'Ratio: ' + ratio + '% of expected';
+          }
+        }
+      }
+    },
+  },
+});
+</script>
+</div>
+</body>
+</html>

@@ -1,0 +1,194 @@
+{
+  "generatedAt": "2026-06-05T13:52:24.207Z",
+  "totalBets": 5400,
+  "totalSeeds": 115,
+  "revealedSeeds": 110,
+  "steps": [
+    {
+      "step": 1,
+      "name": "Seed Hash Integrity",
+      "status": "PASS",
+      "detail": "110/110 revealed seeds verified (SHA-256 of hex-decoded bytes); 0 failures"
+    },
+    {
+      "step": 2,
+      "name": "Commitment Linkage",
+      "status": "PASS",
+      "detail": "Chain links (independently recomputed): 114/114 match. 115 nextSeedPromotion records present (informational — linkage above is the scored property)."
+    },
+    {
+      "step": 3,
+      "name": "Hash Consistency Within Epoch",
+      "status": "PASS",
+      "detail": "110 epochs; all bets within each epoch share identical serverSeedHashed; 0 inconsistencies"
+    },
+    {
+      "step": 4,
+      "name": "Nonce Audit",
+      "status": "PASS",
+      "detail": "108/110 clean epochs; 2 nonce gaps observed (capture-retry) — for 2, the initial deal is derivable from the revealed seed; the full missing rounds are not verified. 0 unverifiable. Epoch feec4f63: nonce 23 missed (capture-retry); initial deal derivable from revealed seed: AC,7S,6S,5S,10S → none (full missing round not verified); Epoch 6076267c: nonce 15 missed (capture-retry); initial deal derivable from revealed seed: KS,7H,4S,3S,QD → none (full missing round not verified)"
+    },
+    {
+      "step": 5,
+      "name": "Outcome Recomputation",
+      "status": "PASS",
+      "detail": "5400/5400 bets: deck shuffle + held-card replacement recomputed independently; 0 mismatches, 0 skipped (0 reconstructed + 0 unrevealed seed)"
+    },
+    {
+      "step": 6,
+      "name": "Client Seed Influence",
+      "status": "PASS",
+      "detail": "500/500 sampled bets produce different decks with wrong client seed (100.0% change rate)"
+    },
+    {
+      "step": 7,
+      "name": "Payout Math",
+      "status": "PASS",
+      "detail": "5400 bets checked (1196 wins actively validated); amount_won = amount_coins × multiplier (tolerance 1e-6); 0 errors"
+    },
+    {
+      "step": 8,
+      "name": "Multiplier Provenance",
+      "status": "PASS",
+      "detail": "5400 bets: combination → multiplier matches videoPokerConfig.json for all; 0 errors"
+    },
+    {
+      "step": 9,
+      "name": "Phase C Bet-Size Invariance",
+      "status": "PASS",
+      "detail": "100/100 Phase C ($10/hand) bets: deck shuffle is identical regardless of bet amount; 0 mismatches"
+    },
+    {
+      "step": 10,
+      "name": "House Edge Audit",
+      "status": "PASS",
+      "detail": "effective_edge values: 0.1; expected 0.1"
+    },
+    {
+      "step": 11,
+      "name": "Config Completeness",
+      "status": "PASS",
+      "detail": "Single config (Jacks or Better): 10 hand ranks, all multipliers present in videoPokerConfig.json"
+    },
+    {
+      "step": 12,
+      "name": "Epoch Size",
+      "status": "PASS",
+      "detail": "110 epochs with bets; min=1, max=50 bets per epoch"
+    },
+    {
+      "step": 13,
+      "name": "Phase Labels",
+      "status": "PASS",
+      "detail": "Phases present: A, B, C, D, E; expected: A, B, C, D, E"
+    },
+    {
+      "step": 14,
+      "name": "Dataset Hash",
+      "status": "PASS",
+      "detail": "363fd4d4c072a1180ca2e7ab61d0c8dcc6f3300f315449af0d7101dd45dd0654"
+    },
+    {
+      "step": 15,
+      "name": "Phase D — Client Seed Variation",
+      "status": "PASS",
+      "detail": "500 bets, 1 distinct client seed(s), 1 unique to Phase D; recomputation: 500/500 match; hand classification: 500/500 match"
+    },
+    {
+      "step": 16,
+      "name": "Anti-Circularity (Deal-Only Distribution Check)",
+      "status": "PASS",
+      "detail": "C(52,5) = 2598960; counted = 2598960 (sum check: OK); theoretical deal-only RTP = 33.723793% from independent combinatorial enumeration (deal distribution only — the authoritative game RTP is the 99.9000% optimal-play figure in Step 26). 10 hand ranks verified against published combinatorial tables."
+    },
+    {
+      "step": 17,
+      "name": "Simulation Validation — Pass 1 (Deal-Only Distribution)",
+      "status": "PASS",
+      "detail": "10,000,000 rounds (10 streams × 1,000,000); Fisher's combined p=0.798239; streams below α=0.01: 0/10; serial independence fails: 0; empirical deal-only RTP: 33.6999% (theoretical deal-only: 33.7238%) — validates deal distribution, not the game RTP figure (see Step 26 for the authoritative 99.9000% optimal-play RTP)"
+    },
+    {
+      "step": 18,
+      "name": "Pass 2 Cherry-Pick Detection",
+      "status": "PASS",
+      "detail": "110 casino seeds × 100000 nonces each; 5 flagged (binomial p=0.6485, threshold: p≥0.01); aggregate chi-squared: χ²(9)=6.20, p=0.7193; aggregate RTP: 33.7329%"
+    },
+    {
+      "step": 19,
+      "name": "Hand Classification Accuracy",
+      "status": "PASS",
+      "detail": "5400/5400 bets: evaluateHand(final_cards) matches server combination; 0 mismatches"
+    },
+    {
+      "step": 20,
+      "name": "Hold Validity",
+      "status": "PASS",
+      "detail": "5400/5400 bets: held_cards ⊆ initial_cards with |held| ≤ 5; 0 violations"
+    },
+    {
+      "step": 21,
+      "name": "Replacement Pool Determinism",
+      "status": "PASS",
+      "detail": "5400/5400 bets: non-held positions consume deck[5..9] sequentially L→R; 0 mismatches, 0 skipped (reconstructed/unrevealed)"
+    },
+    {
+      "step": 22,
+      "name": "Deck Integrity",
+      "status": "PASS",
+      "detail": "5400/5400 bets: deck[0..9] = 10 unique valid cards from standard 52-card deck; 0 violations"
+    },
+    {
+      "step": 23,
+      "name": "Card Rank Distribution",
+      "status": "PASS",
+      "detail": "27000 cards across 5400 initial hands; χ²(12)=8.39, p=0.7541"
+    },
+    {
+      "step": 24,
+      "name": "Card Suit Distribution",
+      "status": "PASS",
+      "detail": "27000 cards; suits: D=6756 H=6707 S=6790 C=6747; χ²(3)=0.52, p=0.9150"
+    },
+    {
+      "step": 25,
+      "name": "Phase E Hold Pattern Coverage",
+      "status": "PASS",
+      "detail": "800/800 Phase E bets verified; 4 distinct hold patterns: hold-0: 100, hold-1: 500, hold-2: 100, hold-5: 100; 0 failures"
+    },
+    {
+      "step": 26,
+      "name": "Optimal-Play RTP Verification",
+      "status": "PASS",
+      "detail": "Optimal-play RTP: 99.900000% (exhaustive C(52,5) = 2,598,960 hands, 134,459 canonical classes; asserted ≈ 99.900000). Cross-validated against standard 9/6 JoB: 99.543904% (asserted ≈ 99.543904, PASS). Pay table hash matches videoPokerConfig.json."
+    },
+    {
+      "step": 27,
+      "name": "Reconstructed Hands Disclosure",
+      "status": "PASS",
+      "detail": "No reconstructed hands in dataset"
+    }
+  ],
+  "info": [
+    {
+      "label": "RTP Analysis",
+      "detail": "Post-draw empirical RTP: A=32.97% (n=3000), B=60.00% (n=1000), C=27.00% (n=100), D=44.80% (n=500), E=40.13% (n=800). Deviations from optimal-play RTP (99.9000%) reflect player hold decisions and sample variance. The authoritative optimal-play RTP (99.9000%) is established in Step 26 / the optimal-play solver; the deal-only steps (16–18) validate deal distribution, not the RTP figure."
+    },
+    {
+      "label": "Serial Independence (lag-1)",
+      "detail": "Phase B (n=1000): r₁=0.0072 (±0.0949 = 3/√n threshold), z=0.23. Authoritative test: simulation Pass 1 at 10,000,000 deal-only rounds (distribution check, not the RTP figure)."
+    },
+    {
+      "label": "Serial Independence (runs test)",
+      "detail": "Phase B: runs z=0.00, p=1.0000. Live sample size insufficient for authoritative test."
+    },
+    {
+      "label": "Hand Rank Distribution (Live Bets)",
+      "detail": "5400 hands: straight_flush: 1, four_of_a_kind: 2, full_house: 15, flush: 15, straight: 27, three_of_a_kind: 144, two_pair: 294, jacks_or_better: 698, none: 4204. Live distribution reflects player hold decisions (post-draw), not raw deal probabilities. Authoritative deal-only distribution validated in simulation Pass 1 (chi-squared) — deal distribution only, not the RTP figure. The authoritative RTP figure (99.9000%) is in Step 26 / the optimal-play solver."
+    }
+  ],
+  "summary": {
+    "passed": 27,
+    "flags": 0,
+    "hardFail": 0,
+    "verdict": "PROVABLY FAIR — Full Pass"
+  }
+}

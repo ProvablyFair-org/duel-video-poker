@@ -1,0 +1,11 @@
+node_modules/
+dist/
+outputs/*.json
+!outputs/.gitkeep
+!outputs/rtp-convergence.html
+results/*.json
+!results/.gitkeep
+results/merged/*.json
+!results/merged/.gitkeep
+.DS_Store
+*.log

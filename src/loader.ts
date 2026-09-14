@@ -79,3 +79,14 @@ export function groupByPhase(bets: VideoPokerBet[]): Record<string, VideoPokerBe
 export function discardCount(bet: VideoPokerBet): number {
   return 5 - bet.draw.response.held_cards.length;
 }
+
+// ── POPULATION OF RECORD ─────────────────────────────────────────────────────────
+// The capture plan, stated as CODE so a shrunken dataset cannot pass by agreeing with
+// itself. Deleting rounds and doctoring the header to match leaves a file that is
+// internally consistent and re-pins cleanly — and re-pinning is exactly what a forger
+// does, so EXPECTED_HASH cannot see it. The counts have to be asserted from somewhere
+// the dataset does not control, and a step that finds them wrong must HARD FAIL.
+export const EXPECTED_BETS  = 5400;
+export const EXPECTED_SEEDS = 115;
+export const EXPECTED_PHASE_BETS: Readonly<Record<string, number>> =
+  Object.freeze({ A: 3000, B: 1000, C: 100, D: 500, E: 800 });

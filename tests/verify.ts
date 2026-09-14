@@ -17,6 +17,7 @@ import * as dataset      from './steps/dataset';
 import * as simulation   from './steps/simulation';
 import * as gameSpecific from './steps/game-specific';
 import * as statistical  from './steps/statistical';
+import * as artifacts   from './steps/artifacts';
 
 // ── Pre-flight: dataset hash ───────────────────────────────────────────────────
 
@@ -70,6 +71,7 @@ const results = [
   ...dataset.run(ctx),       // Steps 10–15
   ...simulation.run(ctx),    // Steps 16–18
   ...gameSpecific.run(ctx),  // Steps 19–27
+  ...artifacts.run(ctx),    // Step 28
 ];
 
 // ── Run informational items (live-bet stats — underpowered, not scored) ──────

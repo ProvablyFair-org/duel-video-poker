@@ -4,7 +4,10 @@
 
 import type { StepResult, VerifyContext } from './context';
 import { step } from './context';
-import { checkDatasetHash } from '../../src/loader';
+import {
+  checkDatasetHash,
+  EXPECTED_BETS, EXPECTED_SEEDS, EXPECTED_PHASE_BETS,
+} from '../../src/loader';
 import { computeShuffledDeck } from '../../src/rng';
 import { evaluateHand } from '../../src/hand-evaluator';
 import type { HandRank } from '../../src/types';
@@ -78,9 +81,29 @@ export function run(ctx: VerifyContext): StepResult[] {
   const expected = ['A', 'B', 'C', 'D', 'E'];
   const hasAll   = expected.every(p => phases.has(p as any));
 
-  const s13 = step(13, 'Phase Labels',
-    hasAll ? 'PASS' : 'FLAG',
-    `Phases present: ${[...phases].sort().join(', ')}; expected: ${expected.join(', ')}`,
+  // Bound to CODE constants in src/loader.ts, never to the dataset's own header. A dataset
+  // that disagrees with the capture plan fails here even when its hash pin has been updated
+  // to match it. FLAG was the wrong verdict: it exits 0, so a shrunken capture still passed.
+  const phaseCounts: Record<string, number> = {};
+  for (const b of bets) phaseCounts[b.phase] = (phaseCounts[b.phase] ?? 0) + 1;
+  const phaseBad = Object.entries(EXPECTED_PHASE_BETS)
+    .filter(([p, n]) => (phaseCounts[p] ?? 0) !== n)
+    .map(([p, n]) => `${p}: ${phaseCounts[p] ?? 0} != ${n}`);
+  const extraPhases = Object.keys(phaseCounts).filter(p => !(p in EXPECTED_PHASE_BETS));
+  const betsOk  = bets.length === EXPECTED_BETS;
+  const seedsOk = ctx.seeds.length === EXPECTED_SEEDS;
+  const popOk   = betsOk && seedsOk && phaseBad.length === 0 && extraPhases.length === 0;
+
+  const s13 = step(13, 'Population & Phase Labels',
+    popOk && hasAll ? 'PASS' : 'FAIL',
+    `${bets.length}/${EXPECTED_BETS} bets and ${ctx.seeds.length}/${EXPECTED_SEEDS} seed records ` +
+    `against the capture plan in src/loader.ts (code constants, not the dataset header); ` +
+    `per phase ${Object.entries(EXPECTED_PHASE_BETS).map(([p, n]) => `${p}=${phaseCounts[p] ?? 0}/${n}`).join(' ')}; ` +
+    `expected: ${expected.join(', ')}` +
+    (betsOk ? '' : '; BET COUNT MISMATCH') +
+    (seedsOk ? '' : '; SEED COUNT MISMATCH') +
+    (phaseBad.length ? `; PHASE MISMATCH ${phaseBad.join(', ')}` : '') +
+    (extraPhases.length ? `; UNDECLARED PHASE ${extraPhases.join(', ')}` : ''),
   );
 
   // ── Step 14: Dataset Hash ─────────────────────────────────────────────────────

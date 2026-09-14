@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-05T13:52:24.207Z",
+  "generatedAt": "2026-09-14T19:56:21.804Z",
   "totalBets": 5400,
   "totalSeeds": 115,
   "revealedSeeds": 110,
@@ -78,9 +78,9 @@
     },
     {
       "step": 13,
-      "name": "Phase Labels",
+      "name": "Population & Phase Labels",
       "status": "PASS",
-      "detail": "Phases present: A, B, C, D, E; expected: A, B, C, D, E"
+      "detail": "5400/5400 bets and 115/115 seed records against the capture plan in src/loader.ts (code constants, not the dataset header); per phase A=3000/3000 B=1000/1000 C=100/100 D=500/500 E=800/800; expected: A, B, C, D, E"
     },
     {
       "step": 14,
@@ -165,6 +165,12 @@
       "name": "Reconstructed Hands Disclosure",
       "status": "PASS",
       "detail": "No reconstructed hands in dataset"
+    },
+    {
+      "step": 28,
+      "name": "Artifact Integrity (pinned artifacts of record)",
+      "status": "PASS",
+      "detail": "3 artifact(s) checked against src/artifact-pins.ts; optimal-play-rtp.json matches its pin; rtp-convergence.html matches its pin; simulation-results.json matches its pin"
     }
   ],
   "info": [
@@ -186,7 +192,7 @@
     }
   ],
   "summary": {
-    "passed": 27,
+    "passed": 28,
     "flags": 0,
     "hardFail": 0,
     "verdict": "PROVABLY FAIR — Full Pass"

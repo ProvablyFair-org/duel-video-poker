@@ -13,6 +13,10 @@
  * run that produced it.
  */
 export const ARTIFACT_PINS: Readonly<Record<string, string>> = Object.freeze({
+  'chi-squared-results.json':
+    'ee9fa8a101c96a14a2338a29fdca0707e2ac89365c5c411ebc9f2123e9ca41f3',
+  'determinism-log.json':
+    'df87f00ac24ec9c33ce0fedd8efa56bbb24dcf5baf900c0bafe2d06ae60d7be2',
   'optimal-play-rtp.json':
     '9d0607c24b9ba16f1f6c6ce66c50ec36e7773a929db90b0ddb6da630aa105a62',
   'rtp-convergence.html':

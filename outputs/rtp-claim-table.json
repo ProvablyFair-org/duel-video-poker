@@ -1,0 +1,40 @@
+{
+  "package": "duel/video-poker",
+  "game": "video-poker",
+  "settingSpace": "one setting: Jacks or Better at stake tier 0 (E20 scaling_edge id 1, stakes up to 1182.855407010385761), the audited pay table (videoPokerConfig.json), optimal play; tiers 1–51 are not tabled (no optimal-play solve for their pay tables)",
+  "rtpMethod": "the exact binary value of the double outputs/optimal-play-rtp.json duel.rtp (src/compute-optimal-rtp.ts: exhaustive enumeration of all 2,598,960 deals and every hold; pinned in src/artifact-pins.ts, checked by Step 26)",
+  "rule": "RTP-CLAIM",
+  "ruleVersion": "1.2.0 (Methodology v1.1: places, per-setting, stake tiers, noted, published, RTP Figure Overstated; agreed 2026-10-14; 1.1.0 2026-10-01; 1.0.0 2026-09-29)",
+  "bandPp": "0.10",
+  "claim": {
+    "kind": "flat",
+    "rtp": "0.999",
+    "source": "game settings: house_edge \"0.001\" on scaling_edge tier id 1 (stakes up to 1182.855407010385761) of Duel's video-poker config, the tier whose multipliers are the audited pay table (E20, GET https://duel.com/api/v2/video-poker/config as fetched 2026-10-05); effective_edge 0.1 on every captured deal and draw (Step 10). The \"Zero Edge\" label is noted, not tested (MANIFEST.md#payouts-and-rtp)"
+  },
+  "settings": 1,
+  "trueMin": {
+    "setting": "jacks-or-better, stake tier 0 (E20 id 1, up to 1182.855407010385761), optimal play",
+    "rtpExact": "4499096027755795/4503599627370496",
+    "rtpPct": "99.900000"
+  },
+  "trueMax": {
+    "setting": "jacks-or-better, stake tier 0 (E20 id 1, up to 1182.855407010385761), optimal play",
+    "rtpExact": "4499096027755795/4503599627370496",
+    "rtpPct": "99.900000"
+  },
+  "houseSideFailures": 0,
+  "playerFavourable": 0,
+  "worst": {
+    "setting": "jacks-or-better, stake tier 0 (E20 id 1, up to 1182.855407010385761), optimal play",
+    "gapPp": "0.000000"
+  },
+  "rangeChecks": [],
+  "outcome": "PASS",
+  "minimalFix": "none — the claim holds for every setting it states a figure for",
+  "unstated": 0,
+  "rowsComplete": true,
+  "buckets": [],
+  "rows": [
+    {"setting":"jacks-or-better, stake tier 0 (E20 id 1, up to 1182.855407010385761), optimal play","rtpExact":"4499096027755795/4503599627370496","rtpPct":"99.900000","gapPp":"0.000000","side":"within-band","outcome":"PASS"}
+  ]
+}

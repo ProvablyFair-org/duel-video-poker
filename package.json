@@ -1,16 +1,25 @@
 {
   "name": "duel-video-poker-audit",
-  "version": "1.0.0",
-  "description": "Provably fair audit \u2014 Duel.com Video Poker (Jacks or Better)",
+  "version": "1.1.0",
+  "description": "Provably fair audit — Duel.com Video Poker (Jacks or Better)",
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
+    "release-manifest": "node scripts/release-manifest.mjs",
     "test": "mocha && npm run verify",
+    "test:full": "mocha && npm run simulate && npm run compute-optimal-rtp && npm run verify",
     "verify": "ts-node tests/verify.ts",
+    "report": "PF_EMIT=1 ts-node tests/verify.ts",
     "simulate": "ts-node src/simulate.ts",
-    "compute-optimal-rtp": "ts-node src/compute-optimal-rtp.ts"
+    "compute-optimal-rtp": "ts-node src/compute-optimal-rtp.ts",
+    "mutate": "node scripts/mutate.mjs",
+    "rtp-claim:write": "ts-node src/rtp-settings.ts"
   },
   "devDependencies": {
     "@types/mocha": "^10",
     "@types/node": "^22",
+    "chart.js": "4.4.1",
     "mocha": "^11",
     "ts-node": "^10",
     "typescript": "^5"

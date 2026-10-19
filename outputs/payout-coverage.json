@@ -1,0 +1,30 @@
+{
+  "variant": "Jacks or Better (single config)",
+  "handRanks": 10,
+  "multipliersPresent": 10,
+  "betsObserved": 5400,
+  "observedRankCounts": {
+    "none": 4204,
+    "jacks_or_better": 698,
+    "three_of_a_kind": 144,
+    "two_pair": 294,
+    "full_house": 15,
+    "straight": 27,
+    "flush": 15,
+    "four_of_a_kind": 2,
+    "straight_flush": 1
+  },
+  "ranksExercisedByLivePlay": 9,
+  "ranksNeverExercised": 1,
+  "uncoveredDealStageRtpShare": 0.0037102189601237743,
+  "note": "A payout cell is one of the ten hand ranks in the committed videoPokerConfig.json pay table. `ranksNeverExercised` are the ranks no captured hand ever finished on, so this dataset does not confirm their multipliers against live play. Probabilities and the RTP share are stated at the DEAL stage, from the exact C(52,5) = 2,598,960 combinatorics — independent of the operator config, and a LOWER bound on play frequency, since a player drawing toward a hand reaches it more often than a straight deal does. The full pay table is covered analytically by the optimal-play RTP computation in src/compute-optimal-rtp.ts.",
+  "uncoveredCells": [
+    {
+      "rank": "royal_flush",
+      "multiplier": 812.9719437907615,
+      "dealStageCombinations": 4,
+      "dealStageProbability": 0.0000015390771693292702,
+      "dealStageRtpContribution": 0.0012512265579936
+    }
+  ]
+}

@@ -1,0 +1,696 @@
+[
+ {
+  "name": "M01 a revealed server seed corrupted",
+  "step": 1,
+  "expect": "[FAIL] Step 1",
+  "guard": "VP-01: every revealed seed must hash to its commitment.",
+  "file": "tests/verify.ts",
+  "find": "const seedMap = buildSeedMap(ds.seeds);",
+  "replace": "ds.seeds[20].seed.serverSeed = '00'.repeat(32); // MUTATION\nconst seedMap = buildSeedMap(ds.seeds);",
+  "runner": "verify"
+ },
+ {
+  "name": "M02 a forward commitment link broken",
+  "step": 2,
+  "expect": "[FAIL] Step 2",
+  "guard": "VP-02: the next-seed hash must pre-commit the following epoch.",
+  "file": "tests/verify.ts",
+  "find": "const seedMap = buildSeedMap(ds.seeds);",
+  "replace": "ds.seeds[30].seed.nextServerSeedHash = '0'.repeat(64); // MUTATION\nconst seedMap = buildSeedMap(ds.seeds);",
+  "runner": "verify"
+ },
+ {
+  "name": "M03 a foreign commitment inside an epoch",
+  "step": 3,
+  "expect": "[FAIL] Step 3",
+  "guard": "VP-03: epochs are keyed by the rotation timeline, so a swapped hash inside one is seen.",
+  "file": "tests/verify.ts",
+  "find": "const seedMap = buildSeedMap(ds.seeds);",
+  "replace": "ds.bets[10].seed.serverSeedHashed = ds.bets[60].seed.serverSeedHashed; // MUTATION\nconst seedMap = buildSeedMap(ds.seeds);",
+  "runner": "verify"
+ },
+ {
+  "name": "M04 a nonce served twice",
+  "step": 4,
+  "expect": "[FAIL] Step 4",
+  "guard": "VP-04: a duplicated nonce is an operator-side violation, a FAIL.",
+  "file": "tests/verify.ts",
+  "find": "const seedMap = buildSeedMap(ds.seeds);",
+  "replace": "ds.bets[5].seed.nonce = ds.bets[4].seed.nonce; // MUTATION\nconst seedMap = buildSeedMap(ds.seeds);",
+  "runner": "verify"
+ },
+ {
+  "name": "M04c two nonces served out of order",
+  "step": 4,
+  "expect": "[FAIL] Step 4",
+  "guard": "VP-04: within an epoch the nonces must rise in capture order. The capture times of bets 5 and 6 (nonces 5 and 6 of the first epoch) are swapped, so nonce 6 is served before nonce 5; every deck still recomputes from its own nonce, and a check on the sorted nonce set cannot see it (Mike QA 19 Oct 2026).",
+  "file": "tests/verify.ts",
+  "find": "const seedMap = buildSeedMap(ds.seeds);",
+  "replace": "{ const t = ds.bets[5].at; ds.bets[5].at = ds.bets[6].at; ds.bets[6].at = t; } // MUTATION\nconst seedMap = buildSeedMap(ds.seeds);",
+  "runner": "verify"
+ },
+ {
+  "name": "M05 a served initial hand altered",
+  "step": 5,
+  "expect": "[FAIL] Step 5",
+  "guard": "VP-07: every served deal must equal the recomputed deck[0..4].",
+  "file": "tests/verify.ts",
+  "find": "const seedMap = buildSeedMap(ds.seeds);",
+  "replace": "ds.bets[100].draw.response.initial_cards = [...ds.bets[100].draw.response.initial_cards!].reverse(); // MUTATION\nconst seedMap = buildSeedMap(ds.seeds);",
+  "runner": "verify"
+ },
+ {
+  "name": "M05b site verifier derive.js edited without re-pin",
+  "step": 5,
+  "expect": "PLAYER VERIFIER",
+  "guard": "VP-24: the vendored site verifier must hash to its pin before it is run.",
+  "file": "verifier-parity/games/video-poker/derive.js",
+  "find": "const MAX_UINT32 = 0xFFFFFFFF;",
+  "replace": "const MAX_UINT32 = 0xFFFFFFFF; ",
+  "runner": "verify"
+ },
+ {
+  "name": "M05c site paytable forged AND re-pinned",
+  "step": 5,
+  "expect": "SITE VERIFIER DISAGREES",
+  "guard": "VP-24: a site verifier that pays a different multiplier must be caught by execution, not only by the pin.",
+  "edits": [
+   {
+    "file": "verifier-parity/games/video-poker/paytables.js",
+    "find": "  straight:          4,",
+    "replace": "  straight:          5,"
+   }
+  ],
+  "repin": [
+   {
+    "file": "src/site-verifier.ts",
+    "find": "55d04619dada49ffa0139c319210f75f790fe9d1fbd3ad028dad7545ac3988f6",
+    "hashOf": "verifier-parity/games/video-poker/paytables.js"
+   }
+  ],
+  "runner": "verify"
+ },
+ {
+  "name": "M06 client seed dropped from the HMAC message",
+  "step": 6,
+  "expect": "[FAIL] Step 6",
+  "guard": "VP-06: the client seed must be a genuine HMAC input.",
+  "file": "src/rng.ts",
+  "find": "const message = `${clientSeed}:${nonce}:${cursor}`;",
+  "replace": "const message = `fixed:${nonce}:${cursor}`;",
+  "runner": "verify"
+ },
+ {
+  "name": "M07 a win credit nudged by one 1e-18 unit",
+  "step": 7,
+  "expect": "[FAIL] Step 7",
+  "guard": "VP-11: money is compared exactly; the former relative 1e-12 forgave this.",
+  "file": "tests/verify.ts",
+  "find": "const seedMap = buildSeedMap(ds.seeds);",
+  "replace": "{ const b = ds.bets.find(x => x.draw.response.multiplier === '2')!; b.draw.response.amount_won = b.draw.response.amount_won + '0000000000000001'; } // MUTATION\nconst seedMap = buildSeedMap(ds.seeds);",
+  "runner": "verify"
+ },
+ {
+  "name": "M08 a served multiplier differs from the pinned paytable",
+  "step": 8,
+  "expect": "[FAIL] Step 8",
+  "guard": "VP-13: the served multiplier must equal the pinned table's cell for its rank.",
+  "file": "tests/verify.ts",
+  "find": "const seedMap = buildSeedMap(ds.seeds);",
+  "replace": "{ const b = ds.bets.find(x => x.draw.response.multiplier === '2')!; b.draw.response.multiplier = '3'; b.draw.response.amount_won = '0.03'; } // MUTATION\nconst seedMap = buildSeedMap(ds.seeds);",
+  "runner": "verify"
+ },
+ {
+  "name": "M09 an elevated-stake win credit forged",
+  "step": 9,
+  "expect": "[FAIL] Step 9",
+  "guard": "VP-12: every Phase C paying hand must be credited exactly stake × multiplier.",
+  "file": "tests/verify.ts",
+  "find": "const seedMap = buildSeedMap(ds.seeds);",
+  "replace": "{ const b = ds.bets.find(x => x.phase === 'C' && x.draw.response.multiplier !== '0')!; b.draw.response.amount_won = '10.000000000000000001'; } // MUTATION\nconst seedMap = buildSeedMap(ds.seeds);",
+  "runner": "verify"
+ },
+ {
+  "name": "M10 a served effective_edge changed",
+  "step": 10,
+  "expect": "[FAIL] Step 10",
+  "guard": "VP-31: every served edge field equals the declared flat edge.",
+  "file": "tests/verify.ts",
+  "find": "const seedMap = buildSeedMap(ds.seeds);",
+  "replace": "ds.bets[0].deal.response.effective_edge = 0.2; // MUTATION\nconst seedMap = buildSeedMap(ds.seeds);",
+  "runner": "verify"
+ },
+ {
+  "name": "M11 paytable order inverted (flush below straight)",
+  "step": 11,
+  "expect": "PAYTABLE INVERSION",
+  "guard": "VP-14: an inversion is disclosed as a FLAG, never passed.",
+  "file": "src/loader.ts",
+  "find": "'royal_flush', 'straight_flush', 'four_of_a_kind', 'full_house', 'flush',\n  'straight',",
+  "replace": "'royal_flush', 'straight_flush', 'four_of_a_kind', 'full_house', 'straight',\n  'flush',",
+  "runner": "verify"
+ },
+ {
+  "name": "M12 one bet removed from an epoch",
+  "step": 12,
+  "expect": "[FAIL] Step 12",
+  "guard": "VP-05: the epoch-size histogram is pinned.",
+  "file": "tests/verify.ts",
+  "find": "const seedMap = buildSeedMap(ds.seeds);",
+  "replace": "ds.bets.splice(200, 1); // MUTATION\nconst seedMap = buildSeedMap(ds.seeds);",
+  "runner": "verify"
+ },
+ {
+  "name": "M13 a bet relabelled to another phase",
+  "step": 13,
+  "expect": "[FAIL] Step 13",
+  "guard": "VP-05: per-phase populations come from src/loader.ts.",
+  "file": "tests/verify.ts",
+  "find": "const seedMap = buildSeedMap(ds.seeds);",
+  "replace": "ds.bets[0].phase = 'B' as any; // MUTATION\nconst seedMap = buildSeedMap(ds.seeds);",
+  "runner": "verify"
+ },
+ {
+  "name": "M14 paytable config edited with the pre-flight disabled",
+  "step": 14,
+  "expect": "[FAIL] Step 14",
+  "guard": "VP-26: Step 14 must catch a config change on its own.",
+  "edits": [
+   {
+    "file": "tests/verify.ts",
+    "find": "if (!configCheck.match) { process.exit(1); }",
+    "replace": "// MUTATION: pre-flight disabled"
+   },
+   {
+    "file": "videoPokerConfig.json",
+    "find": "\"variant\": \"Jacks or Better\",",
+    "replace": "\"variant\": \"Jacks or Better \","
+   }
+  ],
+  "runner": "verify"
+ },
+ {
+  "name": "M14b dataset edited with the pre-flight disabled",
+  "step": 14,
+  "expect": "[FAIL] Step 14",
+  "guard": "VP-26: Step 14 re-asserts the dataset pin.",
+  "edits": [
+   {
+    "file": "tests/verify.ts",
+    "find": "if (!hashCheck.match) { process.exit(1); }",
+    "replace": "// MUTATION: pre-flight disabled"
+   },
+   {
+    "file": "data/video-poker-dataset-5400bets.json",
+    "find": "\"platform\": \"Duel.com\"",
+    "replace": "\"platform\": \"Duel.com \""
+   }
+  ],
+  "runner": "verify"
+ },
+ {
+  "name": "M15 a Phase D bet's client seed altered",
+  "step": 15,
+  "expect": "[FAIL] Step 15",
+  "guard": "VP-06: every Phase D bet must recompute under its player-set seed.",
+  "file": "tests/verify.ts",
+  "find": "const seedMap = buildSeedMap(ds.seeds);",
+  "replace": "{ const b = ds.bets.find(x => x.phase === 'D')!; b.seed.clientSeed = b.seed.clientSeed + 'x'; } // MUTATION\nconst seedMap = buildSeedMap(ds.seeds);",
+  "runner": "verify"
+ },
+ {
+  "name": "M16 negative control neutered (no hand moved)",
+  "step": 16,
+  "expect": "negative control",
+  "guard": "VP-18: the control must actually corrupt the tally.",
+  "file": "tests/steps/simulation.ts",
+  "find": "    copy[from] = (copy[from] ?? 0) - 1;\n    copy[to] = (copy[to] ?? 0) + 1;\n",
+  "replace": "    // MUTATION: control neutered\n",
+  "runner": "verify"
+ },
+ {
+  "name": "M17 Pass 1 p-value forged AND the artifact re-pinned",
+  "step": 17,
+  "expect": "[FAIL] Step 17",
+  "guard": "VP-20: a forged Pass 1 statistic must fail its gate.",
+  "edits": [
+   {
+    "file": "outputs/simulation-results.json",
+    "find": "\"pValue\": 0.7982388580974303",
+    "replace": "\"pValue\": 0.0012388580974303"
+   }
+  ],
+  "repin": [
+   {
+    "file": "src/artifact-pins.ts",
+    "find": "db2253dee6cf85e7255c9da2d9f8eddb7dd85c0c54c5290b2db25efeede7e446",
+    "hashOf": "outputs/simulation-results.json"
+   }
+  ],
+  "runner": "verify"
+ },
+ {
+  "name": "M18 Pass 2 binomial p forged AND the artifact re-pinned",
+  "step": 18,
+  "expect": "[FAIL] Step 18",
+  "guard": "VP-21: a forged cherry-pick statistic must fail its gate.",
+  "edits": [
+   {
+    "file": "outputs/simulation-results.json",
+    "find": "\"cherryPickBinomial\": 0.648489885286662",
+    "replace": "\"cherryPickBinomial\": 0.001"
+   }
+  ],
+  "repin": [
+   {
+    "file": "src/artifact-pins.ts",
+    "find": "db2253dee6cf85e7255c9da2d9f8eddb7dd85c0c54c5290b2db25efeede7e446",
+    "hashOf": "outputs/simulation-results.json"
+   }
+  ],
+  "runner": "verify"
+ },
+ {
+  "name": "M19 a served hand rank wrong",
+  "step": 19,
+  "expect": "[FAIL] Step 19",
+  "guard": "VP-10: the served rank must equal the evaluator on the served final hand.",
+  "file": "tests/verify.ts",
+  "find": "const seedMap = buildSeedMap(ds.seeds);",
+  "replace": "{ const b = ds.bets.find(x => x.draw.response.combination === 'none')!; b.draw.response.combination = 'two_pair'; } // MUTATION\nconst seedMap = buildSeedMap(ds.seeds);",
+  "runner": "verify"
+ },
+ {
+  "name": "M20 a held card not in the dealt hand",
+  "step": 20,
+  "expect": "[FAIL] Step 20",
+  "guard": "VP-10: held ⊆ initial.",
+  "file": "tests/verify.ts",
+  "find": "const seedMap = buildSeedMap(ds.seeds);",
+  "replace": "{ const b = ds.bets[0]; const c = ['2D','3D','4D','5D','6D','7D'].find(x => !b.draw.response.initial_cards!.includes(x))!; b.draw.response.held_cards = [c]; } // MUTATION\nconst seedMap = buildSeedMap(ds.seeds);",
+  "runner": "verify"
+ },
+ {
+  "name": "M21 a served final hand altered",
+  "step": 21,
+  "expect": "[FAIL] Step 21",
+  "guard": "VP-10/VP-17: the draw fills non-held positions from deck[5..9] in order.",
+  "file": "tests/verify.ts",
+  "find": "const seedMap = buildSeedMap(ds.seeds);",
+  "replace": "ds.bets[0].draw.response.final_cards = [...ds.bets[0].draw.response.final_cards!].reverse(); // MUTATION\nconst seedMap = buildSeedMap(ds.seeds);",
+  "runner": "verify"
+ },
+ {
+  "name": "M22 rejection ceiling off by one",
+  "step": 22,
+  "expect": "DRAW BIAS",
+  "guard": "VP-08: maxFair must be a whole number of ranges for every range.",
+  "file": "src/rng.ts",
+  "find": "  return MAX_UINT32 - (MAX_UINT32 % range);",
+  "replace": "  return MAX_UINT32 - (MAX_UINT32 % range) - 1;",
+  "runner": "verify"
+ },
+ {
+  "name": "M22b rejection census neutered",
+  "step": 22,
+  "expect": "census counted",
+  "guard": "VP-08: the census must count every swap.",
+  "file": "src/rng.ts",
+  "find": "        if (census) census.swaps++;\n",
+  "replace": "",
+  "runner": "verify"
+ },
+ {
+  "name": "M23 dealt ranks skewed",
+  "step": 23,
+  "expect": "[INFO] Step 23",
+  "guard": "VP-22: the rank fit must be able to reject — reported as INFO (informational, Mike 2026-09-29: not counted, verdict unchanged); the run is rejected by the reproduction gate because the committed Step 23 record changes.",
+  "file": "tests/verify.ts",
+  "find": "const seedMap = buildSeedMap(ds.seeds);",
+  "replace": "for (let i = 0; i < 3000; i++) ds.bets[i].draw.response.initial_cards = ['2D', '2H', '2S', '2C', '3D']; // MUTATION\nconst seedMap = buildSeedMap(ds.seeds);",
+  "runner": "verify"
+ },
+ {
+  "name": "M24 dealt suits skewed",
+  "step": 24,
+  "expect": "[INFO] Step 24",
+  "guard": "VP-22: the suit fit must be able to reject — reported as INFO (informational, Mike 2026-09-29: not counted, verdict unchanged); the run is rejected by the reproduction gate because the committed Step 24 record changes.",
+  "file": "tests/verify.ts",
+  "find": "const seedMap = buildSeedMap(ds.seeds);",
+  "replace": "for (let i = 0; i < 3000; i++) ds.bets[i].draw.response.initial_cards = ['2D', '3D', '4D', '5D', '6D']; // MUTATION\nconst seedMap = buildSeedMap(ds.seeds);",
+  "runner": "verify"
+ },
+ {
+  "name": "M25 a Phase E bet moved to an unplanned hold pattern",
+  "step": 25,
+  "expect": "[FAIL] Step 25",
+  "guard": "VP-15/VP-17: hold coverage is asserted against the plan.",
+  "file": "tests/verify.ts",
+  "find": "const seedMap = buildSeedMap(ds.seeds);",
+  "replace": "{ const b = ds.bets.find(x => x.phase === 'E' && x.draw.response.held_cards.length === 0)!; b.draw.response.held_cards = [b.draw.response.initial_cards![0], b.draw.response.initial_cards![1]]; } // MUTATION\nconst seedMap = buildSeedMap(ds.seeds);",
+  "runner": "verify"
+ },
+ {
+  "name": "M26 optimal-play RTP forged AND re-pinned",
+  "step": 26,
+  "expect": "[FAIL] Step 26",
+  "guard": "VP-19: the headline figure is asserted against the published constant.",
+  "edits": [
+   {
+    "file": "outputs/optimal-play-rtp.json",
+    "find": "\"rtpPercent\": \"99.900000\"",
+    "replace": "\"rtpPercent\": \"99.950000\""
+   }
+  ],
+  "repin": [
+   {
+    "file": "src/artifact-pins.ts",
+    "find": "714eca5e92f209b64c8805ed049a3f6915d95a2a616d182f075ccbd4d5ea9fe7",
+    "hashOf": "outputs/optimal-play-rtp.json"
+   }
+  ],
+  "runner": "verify"
+ },
+ {
+  "name": "M26b paytable config forged AND its pin re-pinned",
+  "step": 26,
+  "expect": "[FAIL] Step 26",
+  "guard": "VP-26/VP-19: re-pinning the config in src/ still breaks the payTableHash recorded in the pinned optimal-play artifact.",
+  "edits": [
+   {
+    "file": "videoPokerConfig.json",
+    "find": "\"variant\": \"Jacks or Better\",",
+    "replace": "\"variant\": \"Jacks or Better \","
+   }
+  ],
+  "repin": [
+   {
+    "file": "src/loader.ts",
+    "find": "9daedc8fc7a53e328d50b5e8019c177b32d5bf7992494a7da18136f524a70542",
+    "hashOf": "videoPokerConfig.json"
+   }
+  ],
+  "runner": "verify"
+ },
+ {
+  "name": "M27 a reconstructed record injected",
+  "step": 27,
+  "expect": "[FLAG] Step 27",
+  "guard": "VP-32: reconstructed records are named and never scored as recomputed.",
+  "file": "tests/verify.ts",
+  "find": "const seedMap = buildSeedMap(ds.seeds);",
+  "replace": "(ds.bets[0] as any)._reconstructed = true; // MUTATION\nconst seedMap = buildSeedMap(ds.seeds);",
+  "runner": "verify"
+ },
+ {
+  "name": "M28 pinned convergence chart edited without re-pin",
+  "step": 28,
+  "expect": "[FAIL] Step 28",
+  "guard": "VP-27: pinned artifacts of record.",
+  "file": "outputs/rtp-convergence.html",
+  "find": "<title>DUEL VIDEO POKER",
+  "replace": "<title>DUEL  VIDEO POKER",
+  "runner": "verify"
+ },
+ {
+  "name": "M28b pinned convergence chart deleted",
+  "step": 28,
+  "expect": "[FAIL] Step 28",
+  "guard": "VP-27: absent is not pinned.",
+  "delete": [
+   "outputs/rtp-convergence.html"
+  ],
+  "runner": "verify"
+ },
+ {
+  "name": "M29 captured pilot vector changed (mocha)",
+  "step": 5,
+  "runner": "mocha",
+  "expect": "failing",
+  "guard": "VP-09: the unit tests recompute captured rounds; a changed shuffle must fail them.",
+  "file": "src/rng.ts",
+  "find": "const message = `${clientSeed}:${nonce}:${cursor}`;",
+  "replace": "const message = `${clientSeed}:${nonce + 1}:${cursor}`;"
+ },
+ {
+  "name": "M05d operator Verify-tab capture edited without re-pin",
+  "step": 5,
+  "runner": "verify",
+  "expect": "operator code not run",
+  "guard": "VP-09: the operator code must hash to its pin before it runs.",
+  "file": "evidence/verify-tab/duel-verify-tab-video-poker-2026-04-23.captured.json",
+  "find": "Code written in javascript",
+  "replace": "Code written in JavaScript"
+ },
+ {
+  "name": "M05e operator swap forged AND re-pinned",
+  "step": 5,
+  "runner": "verify",
+  "expect": "OPERATOR CODE DISAGREES",
+  "guard": "VP-09: a changed operator shuffle must be caught by execution, not only by the pin.",
+  "edits": [
+   {
+    "file": "evidence/verify-tab/duel-verify-tab-video-poker-2026-04-23.captured.json",
+    "find": "const j = value % range;",
+    "replace": "const j = (value + 1) % range;"
+   }
+  ],
+  "repin": [
+   {
+    "file": "src/operator-verifier.ts",
+    "find": "f7e0278766eb6407053fe1a6a6ce2072b1a247097d9f27915a3ebb9d21269c87",
+    "hashOf": "evidence/verify-tab/duel-verify-tab-video-poker-2026-04-23.captured.json"
+   }
+  ]
+ },
+ {
+  "name": "M05f an operator source cite no longer quotes the file",
+  "step": 5,
+  "runner": "verify",
+  "expect": "operator source cites",
+  "guard": "VP-09: every cited line must carry the quoted text.",
+  "file": "src/rng.ts",
+  "find": "{ line: 73, text: 'const j = value % range;'",
+  "replace": "{ line: 72, text: 'const j = value % range;'"
+ },
+ {
+  "name": "M17b a Pass 1 stream count row forged AND the artifact re-pinned",
+  "step": 17,
+  "runner": "verify",
+  "expect": "RE-DERIVATION DISAGREES",
+  "guard": "VP-20: the stream statistics are re-derived from the shipped rows; a row that no longer matches its scalars is caught.",
+  "edits": [
+   {
+    "file": "outputs/simulation-results.json",
+    "find": "\"jacks_or_better\": 130064,\n          \"none\": 793992",
+    "replace": "\"jacks_or_better\": 130164,\n          \"none\": 793892"
+   }
+  ],
+  "repin": [
+   {
+    "file": "src/artifact-pins.ts",
+    "find": "db2253dee6cf85e7255c9da2d9f8eddb7dd85c0c54c5290b2db25efeede7e446",
+    "hashOf": "outputs/simulation-results.json"
+   }
+  ]
+ },
+ {
+  "name": "M18b a Pass 2 early-window row forged AND the artifact re-pinned",
+  "step": 18,
+  "runner": "verify",
+  "expect": "RE-DERIVATION DISAGREES",
+  "guard": "VP-21: per-seed windows must reconcile and re-derive to the shipped scalars.",
+  "edits": [
+   {
+    "file": "outputs/simulation-results.json",
+    "find": "\"two_pair\": 3,\n          \"jacks_or_better\": 4,",
+    "replace": "\"two_pair\": 4,\n          \"jacks_or_better\": 3,"
+   }
+  ],
+  "repin": [
+   {
+    "file": "src/artifact-pins.ts",
+    "find": "db2253dee6cf85e7255c9da2d9f8eddb7dd85c0c54c5290b2db25efeede7e446",
+    "hashOf": "outputs/simulation-results.json"
+   }
+  ]
+ },
+ {
+  "name": "M17c the serial census forged (first value moved) AND the artifact re-pinned",
+  "step": 17,
+  "runner": "verify",
+  "expect": "serial census marginal",
+  "guard": "VP-20: lag-1 and runs are re-derived from the shipped transition census, whose marginals must reconcile exactly with the hand-rank histograms.",
+  "edits": [
+   {
+    "file": "outputs/simulation-results.json",
+    "find": "\"first\": 9,",
+    "replace": "\"first\": 8,"
+   }
+  ],
+  "repin": [
+   {
+    "file": "src/artifact-pins.ts",
+    "find": "db2253dee6cf85e7255c9da2d9f8eddb7dd85c0c54c5290b2db25efeede7e446",
+    "hashOf": "outputs/simulation-results.json"
+   }
+  ]
+ },
+ {
+  "name": "M17d dealt-card census skewed (5,000 deals moved between two cards, sum kept) AND re-pinned",
+  "step": 17,
+  "runner": "verify",
+  "expect": "dealt-card uniformity FAILS",
+  "guard": "VP-20: dealt-card uniformity over the 52 cards is tested per deck position; a skew that keeps the total must fail.",
+  "edits": [
+   {
+    "file": "outputs/simulation-results.json",
+    "find": "          191685,\n          192649,",
+    "replace": "          186685,\n          197649,"
+   }
+  ],
+  "repin": [
+   {
+    "file": "src/artifact-pins.ts",
+    "find": "db2253dee6cf85e7255c9da2d9f8eddb7dd85c0c54c5290b2db25efeede7e446",
+    "hashOf": "outputs/simulation-results.json"
+   }
+  ]
+ },
+ {
+  "name": "M18c captured windows ranked at the bottom (rank rule must fire)",
+  "step": 18,
+  "runner": "verify",
+  "expect": "cherry-pick signal",
+  "guard": "VP-21: the pre-registered rank-sum rule must be reachable — captured windows dealt systematically worse than their seeds' other windows.",
+  "file": "tests/steps/simulation.ts",
+  "find": "    rankSum += ranks[0] - meanR;",
+  "replace": "    rankSum += 1 - meanR; // MUTATION"
+ },
+ {
+  "name": "M18d window census forged (window 0 shifted, total kept) AND re-pinned",
+  "step": 18,
+  "runner": "verify",
+  "expect": "RE-DERIVATION DISAGREES",
+  "guard": "VP-21: every window is re-derived; window 0 must equal the early-window counts and the replay from the revealed seed.",
+  "edits": [
+   {
+    "file": "outputs/simulation-results.json",
+    "find": "\"windowPayoutsInt\": \"10,15,",
+    "replace": "\"windowPayoutsInt\": \"11,14,"
+   }
+  ],
+  "repin": [
+   {
+    "file": "src/artifact-pins.ts",
+    "find": "db2253dee6cf85e7255c9da2d9f8eddb7dd85c0c54c5290b2db25efeede7e446",
+    "hashOf": "outputs/simulation-results.json"
+   }
+  ]
+ },
+ {
+  "name": "M28c impossible value written AND re-pinned",
+  "step": 28,
+  "runner": "verify",
+  "expect": "VALUE DOMAINS (VP-27)",
+  "guard": "VP-27: more flagged seeds than revealed seeds is impossible; the domain check must fail it even though the artifact is re-pinned (Step 18's reconciliation also catches it; the marker proves the domain check fired).",
+  "edits": [
+   {
+    "file": "outputs/simulation-results.json",
+    "find": "\"flaggedSeeds\": 5,",
+    "replace": "\"flaggedSeeds\": 500,"
+   }
+  ],
+  "repin": [
+   {
+    "file": "src/artifact-pins.ts",
+    "find": "db2253dee6cf85e7255c9da2d9f8eddb7dd85c0c54c5290b2db25efeede7e446",
+    "hashOf": "outputs/simulation-results.json"
+   }
+  ]
+ },
+ {
+  "name": "M28d an undeclared numeric field added to a committed product",
+  "step": 28,
+  "runner": "verify",
+  "expect": "has no declared value domain",
+  "guard": "VP-27: domains are bidirectional; a numeric leaf no rule covers fails.",
+  "file": "outputs/determinism-log.json",
+  "find": "\"skipped\": 0",
+  "replace": "\"skipped\": 0,\n  \"forgedRate\": 0.5"
+ },
+ {
+  "name": "MC3a one setting misses its stated figure: the optimal-play solve of stake tier 0 lowered to 99.7 %",
+  "step": 26,
+  "runner": "test",
+  "expect": "VERDICT: RTP FIGURE OVERSTATED",
+  "expectExit": 5,
+  "regen": [
+   "rtp-table",
+   "record"
+  ],
+  "guard": "FIXPASS2 class C3, 14 Oct 2026: (i) a miss on the one setting the RTP table holds (stake tier 0) must end RTP FIGURE OVERSTATED, exit 5, never exit 1 or 2. The table's figure is the optimal-play solve, outputs/optimal-play-rtp.json duel.rtp; a lowered pay-table cell reaches it only through npm run compute-optimal-rtp, and every Pass 1 statistic of the pinned simulation is recomputed from the pay table (npm run simulate), neither of which is re-run in a mutation (the simulation is never re-run on this machine). So the solve's output is the cell changed: duel.rtp 0.9990000000028132 → 0.9970000000028132 (rtpPercent 99.700000, 0.2 pp under the 99.9 % claim), the artifact re-pinned in src/artifact-pins.ts, table and record regenerated. Before C3 Step 26 held duel.rtpPercent to the published 99.900000 ± 0.0001 pp and failed this (exit 1) before the rule; it now fails only a figure above it.",
+  "edits": [
+   {
+    "file": "outputs/optimal-play-rtp.json",
+    "find": "\"rtp\": 0.9990000000028132,\n    \"rtpPercent\": \"99.900000\"",
+    "replace": "\"rtp\": 0.9970000000028132,\n    \"rtpPercent\": \"99.700000\""
+   }
+  ],
+  "repin": [
+   {
+    "file": "src/artifact-pins.ts",
+    "find": "714eca5e92f209b64c8805ed049a3f6915d95a2a616d182f075ccbd4d5ea9fe7",
+    "hashOf": "outputs/optimal-play-rtp.json"
+   }
+  ]
+ },
+ {
+  "name": "MC3as the same change as MC3a, RTP table NOT regenerated: a stale table is a reproduction failure",
+  "step": 26,
+  "runner": "verify",
+  "expect": "DIFFERS from this run",
+  "expectExit": 1,
+  "guard": "Ruling 14 Oct 2026 (FIXPASS2): a committed RTP table that does not equal the run or its pin is a reproduction failure, exit 1, miss or no miss. MC3a without regenerating the table must end exit 1 with the table reported as differing, never exit 5.",
+  "edits": [
+   {
+    "file": "outputs/optimal-play-rtp.json",
+    "find": "\"rtp\": 0.9990000000028132,\n    \"rtpPercent\": \"99.900000\"",
+    "replace": "\"rtp\": 0.9970000000028132,\n    \"rtpPercent\": \"99.700000\""
+   }
+  ],
+  "repin": [
+   {
+    "file": "src/artifact-pins.ts",
+    "find": "714eca5e92f209b64c8805ed049a3f6915d95a2a616d182f075ccbd4d5ea9fe7",
+    "hashOf": "outputs/optimal-play-rtp.json"
+   }
+  ]
+ },
+ {
+  "name": "MC3b the stated figure raised in the claim source: 99.9 % -> 100.1 %",
+  "step": 26,
+  "runner": "test",
+  "expect": "VERDICT: RTP FIGURE OVERSTATED",
+  "expectExit": 5,
+  "regen": [
+   "rtp-table",
+   "record"
+  ],
+  "guard": "FIXPASS2 class C3, 14 Oct 2026: (ii) the published figure raised where the claim is stated (src/rtp-settings.ts RTP_CLAIM, house_edge 0.001 on E20 tier id 1) to 100.1 %, 0.2 pp above what every setting really returns: every setting misses by more than the 0.1 pp band, so the run must end RTP FIGURE OVERSTATED, exit 5. Table and record regenerated in the copy. Runner test = mocha then verify, as npm test runs them: no unit test, label check or operator-FLAG branch may end the run first.",
+  "file": "src/rtp-settings.ts",
+  "find": "  kind: 'flat',\n  rtp: '0.999',",
+  "replace": "  kind: 'flat',\n  rtp: '1.001', // MUTATION: stated figure raised"
+ },
+ {
+  "name": "MC3bs the same change as MC3b, RTP table NOT regenerated: a stale table is a reproduction failure",
+  "step": 26,
+  "runner": "verify",
+  "expect": "DIFFERS from this run",
+  "expectExit": 1,
+  "guard": "Ruling 14 Oct 2026 (FIXPASS2): a committed RTP table that does not equal the run or its pin is a reproduction failure, exit 1, miss or no miss. MC3b without regenerating the table must end exit 1 with the table reported as differing, never exit 5: the miss is only reported on a consistent package.",
+  "file": "src/rtp-settings.ts",
+  "find": "  kind: 'flat',\n  rtp: '0.999',",
+  "replace": "  kind: 'flat',\n  rtp: '1.001', // MUTATION: stated figure raised"
+ }
+]

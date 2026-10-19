@@ -489,7 +489,9 @@ async function main(): Promise<void> {
   const pass2 = computeOptimalRTP(scoreTable, multsDuel, aggDuel, 'Duel.com');
 
   // ── Write artifact ────────────────────────────────────────────────────
-  const outDir = path.join(__dirname, '../outputs');
+  // Like src/simulate.ts: a plain run writes under outputs/run/ (gitignored) and never over the pinned
+  // artifact of record; PF_EMIT=1 is the deliberate refresh, which means re-pinning src/artifact-pins.ts.
+  const outDir = path.join(__dirname, process.env.PF_EMIT === '1' ? '../outputs' : '../outputs/run');
   if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
 
   // Summarize canonical classes for the Duel pass
@@ -512,8 +514,11 @@ async function main(): Promise<void> {
       optimalHoldCount: cl.optimalHoldCount,
     }));
 
+  // ARTIFACTS OF RECORD CARRY NO RUN METADATA (profile VP-27, 2026-09-26). This artifact used to
+  // carry `generatedAt` and the wall-clock `elapsed` seconds of each enumeration, so no regeneration
+  // could reproduce its pinned bytes even with every figure identical. Both are properties of the
+  // run, not of the result; they are printed to the console and no longer written.
   const artifact = {
-    generatedAt: new Date().toISOString(),
     totalHands: TOTAL_5,
     crossValidation: {
       payTable: standard96,
@@ -521,7 +526,6 @@ async function main(): Promise<void> {
       rtpPercent: (pass1.rtp*100).toFixed(6),
       target, tolerance,
       pass: xvPass,
-      elapsed: pass1.elapsed,
       canonicalClasses: pass1.classes.size,
     },
     duel: {
@@ -529,7 +533,6 @@ async function main(): Promise<void> {
       payTableHash: configHash,
       rtp: pass2.rtp,
       rtpPercent: (pass2.rtp*100).toFixed(6),
-      elapsed: pass2.elapsed,
       canonicalClasses: pass2.classes.size,
       classSummary,
       topClasses,

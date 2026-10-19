@@ -84,7 +84,10 @@ export interface DrawResponse {
   effective_edge: number;
 }
 
-/** Zero-Edge rakeback transaction (separate from the bet transaction). */
+/**
+ * Zero-Edge rakeback transaction (separate from the bet transaction). The field exists in this
+ * schema, but the capture holds none: no captured bet carries a `rakeback` record.
+ */
 export interface ZeroEdgeRakeback {
   id: number;
   bet_id: number;
@@ -101,8 +104,8 @@ export interface BetSeed {
 
 /**
  * Canonical per-round record. Video Poker is a two-step game: every round has a deal
- * and a draw. We store both, plus the revealed seed data (post-rotation) and the
- * rakeback transaction.
+ * and a draw. We store both, plus the revealed seed data (post-rotation). The optional
+ * rakeback field exists, but the capture holds none.
  */
 export interface VideoPokerBet {
   at: string;

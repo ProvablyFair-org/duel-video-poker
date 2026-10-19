@@ -176,13 +176,46 @@ export function runsTest(series: readonly number[]): RunsTestResult {
     if (above) n1++;
     if (above !== prevAbove) { runs++; prevAbove = above; }
   }
-  const n        = series.length;
+  return runsStatistic(runs, n1, series.length);
+}
+
+/**
+ * The Wald-Wolfowitz statistic from its three integer inputs (runs, n1 above-or-at-median, n). Split
+ * out of runsTest on 2026-09-26 so tests/steps/simulation.ts can compute it from the shipped serial
+ * census with the SAME arithmetic the simulator used on the sequence (profile VP-20).
+ */
+export function runsStatistic(runs: number, n1: number, n: number): RunsTestResult {
   const n2       = n - n1;
   const expected = (2 * n1 * n2) / n + 1;
   const varRuns  = (2 * n1 * n2 * (2 * n1 * n2 - n)) / (n * n * (n - 1));
   const z        = varRuns > 0 ? (runs - expected) / Math.sqrt(varRuns) : 0;
   const pValue   = 2 * (1 - normalCDF(Math.abs(z)));
   return { runs, expected, z, pValue };
+}
+
+/**
+ * The median runsTest uses (quickMedian), computed from value counts instead of the series:
+ * counts[v] = occurrences of integer value v (v = 0..counts.length-1), n = Σ counts. Same branches as
+ * quickMedian, so the two agree exactly on any series whose histogram is `counts`.
+ */
+export function medianFromCounts(counts: readonly number[]): number {
+  const n = counts.reduce((a, b) => a + b, 0);
+  const mid = Math.floor(n / 2);
+  let cum = 0;
+  for (let v = 0; v < counts.length; v++) {
+    if (counts[v] === 0) continue;
+    cum += counts[v];
+    if (n % 2 === 1) {
+      if (cum > mid) return v;
+    } else {
+      if (cum === mid) {
+        for (let w = v + 1; w < counts.length; w++) if (counts[w] > 0) return (v + w) / 2;
+        return v;
+      }
+      if (cum > mid) return v;
+    }
+  }
+  return NaN;
 }
 
 function quickMedian(arr: readonly number[]): number {
@@ -245,4 +278,20 @@ function probit(p: number): number {
   const den = 1 + d1 * t + d2 * t * t + d3 * t * t * t;
   const z  = t - num / den;
   return p > 0.5 ? z : -z;
+}
+
+/**
+ * Upper binomial tail P(X ≥ observed) for X ~ Bin(n, p), summed in log space. Added 2026-09-26 so
+ * tests/steps/simulation.ts can re-derive the Pass 2 cherry-pick p-value from the shipped per-seed
+ * rows instead of reading the artifact's scalar (same formula as src/simulate.ts binomialTailPValue).
+ */
+export function binomialUpperTail(n: number, p: number, observed: number): number {
+  let tail = 0;
+  for (let k = Math.max(0, observed); k <= n; k++) {
+    let logC = 0;
+    const kk = Math.min(k, n - k);
+    for (let i = 0; i < kk; i++) logC += Math.log(n - i) - Math.log(i + 1);
+    tail += Math.exp(logC + k * Math.log(p) + (n - k) * Math.log(1 - p));
+  }
+  return tail;
 }

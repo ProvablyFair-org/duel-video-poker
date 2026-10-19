@@ -1,5 +1,4 @@
 {
-  "generatedAt": "2026-06-03T15:49:59.965Z",
   "totalHands": 2598960,
   "crossValidation": {
     "payTable": {
@@ -19,7 +18,6 @@
     "target": 0.995439,
     "tolerance": 0.000001,
     "pass": true,
-    "elapsed": 53.353,
     "canonicalClasses": 134459
   },
   "duel": {
@@ -38,7 +36,6 @@
     "payTableHash": "9daedc8fc7a53e328d50b5e8019c177b32d5bf7992494a7da18136f524a70542",
     "rtp": 0.9990000000028132,
     "rtpPercent": "99.900000",
-    "elapsed": 52.227,
     "canonicalClasses": 134459,
     "classSummary": {
       "totalClasses": 134459,

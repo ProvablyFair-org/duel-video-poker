@@ -11,6 +11,7 @@ import { HAND_RANKS } from '../../src/types';
 import { evaluateHand } from '../../src/hand-evaluator';
 import { lag1Autocorrelation, runsTest } from '../../src/stats';
 import videoPokerConfig from '../../videoPokerConfig.json';
+import { LIVE_SERIAL_MIN_SAMPLE } from '../../src/loader';
 
 const MULTIPLIERS = videoPokerConfig.multipliers as Record<HandRank, number>;
 
@@ -45,7 +46,7 @@ export function run(ctx: VerifyContext): InfoItem[] {
   });
 
   // 2. Serial Independence (lag-1 autocorrelation) — Phase B only (largest uniform phase)
-  if (phaseB.length >= 50) {
+  if (phaseB.length >= LIVE_SERIAL_MIN_SAMPLE) {
     const multSequence = phaseB.map(b => parseFloat(b.draw.response.multiplier));
     const lag1R = lag1Autocorrelation(multSequence);
     const lag1Z = lag1R * Math.sqrt(phaseB.length);
@@ -59,7 +60,7 @@ export function run(ctx: VerifyContext): InfoItem[] {
   }
 
   // 3. Serial Independence (Wald-Wolfowitz runs test) — Phase B only
-  if (phaseB.length >= 50) {
+  if (phaseB.length >= LIVE_SERIAL_MIN_SAMPLE) {
     const multSequence = phaseB.map(b => parseFloat(b.draw.response.multiplier));
     const runs = runsTest(multSequence);
 

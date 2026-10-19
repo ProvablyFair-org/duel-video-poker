@@ -3,12 +3,24 @@ dist/
 outputs/*.json
 !outputs/.gitkeep
 !outputs/rtp-convergence.html
+!outputs/optimal-play-rtp.json
 results/*.json
 !results/.gitkeep
 results/merged/*.json
 !results/merged/.gitkeep
 .DS_Store
 *.log
+
+# artifacts of record — the verifier scores a run against these (reproduction gate, at tolerance)
+!outputs/verification-results.json
+!outputs/determinism-log.json
+!outputs/chi-squared-results.json
+!outputs/payout-coverage.json
+
+# artifacts of record the verifier does not produce — pinned by SHA-256 in src/artifact-pins.ts
+!outputs/simulation-results.json
+# RTP-CLAIM per-setting table, pinned in src/rtp-settings.ts (Methodology v1.1, D4)
+!outputs/rtp-claim-table.json
 
 # run products — this verifier writes them fresh each run; the committed artifacts are pinned
 outputs/run/

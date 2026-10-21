@@ -2,7 +2,7 @@
   "auditId": "PF-2026-DL08",
   "game": "video-poker",
   "casino": "duel",
-  "release": "v1.1.0",
+  "release": "v1.2.0",
   "framework": "1.1",
   "simulation": {
     "seeding": "pinned",
@@ -28,8 +28,8 @@
     "videoPokerConfig.json": "9daedc8fc7a53e328d50b5e8019c177b32d5bf7992494a7da18136f524a70542",
     "outputs/optimal-play-rtp.json": "714eca5e92f209b64c8805ed049a3f6915d95a2a616d182f075ccbd4d5ea9fe7",
     "outputs/rtp-convergence.html": "1197fd099a317102a34ff5e3b522bf3631a02065441a21d7bcf3e2b0997931a2",
-    "outputs/simulation-results.json": "db2253dee6cf85e7255c9da2d9f8eddb7dd85c0c54c5290b2db25efeede7e446",
-    "outputs/verification-results.json": "09709a63d22f3f4714dc2ed11f908ca6f98d2feae3df02c83ad928599cebf5be",
+    "outputs/simulation-results.json": "9ebc10764af0954d340fcaa177b28950a320f78118c7d42107d886ca5ef5848a",
+    "outputs/verification-results.json": "08ef0be7dab5d3fd86a7ababb35849d5e29918b3c144c3a4f9df5b279f15fa29",
     "outputs/rtp-claim-table.json": "d16678b014447e3b3f958f9f4ee9c432cf34e0f54a108e48911f812eedc44e54"
   },
   "verdict": "PROVABLY FAIR — Full Pass",
@@ -50,15 +50,15 @@
     "stage": "production",
     "qualifier": null
   },
-  "supersedes": "v1.0.0",
+  "supersedes": "v1.1.0",
   "signature": "SHA256:gEujiJm2pRyq7lQsfYQfQ1r97H/J7GdaKHbOW8GtikY",
   "falsifiability": {
     "registry": "tests/mutations.json",
     "runner": "scripts/mutate.mjs",
-    "mutations": 51,
-    "killed": 51,
+    "mutations": 50,
+    "killed": 50,
     "declaredSurvivors": 0,
-    "source": "npm run mutate 2026-10-19 (Apple M2 Max, 12 cores, Node 22.23.1), the whole registry (51 entries, M04c added for the Step 4 nonce-order check) in one run, baseline verify exit 0, mocha exit 0: 51/51 mutations killed, 28/28 scored steps have a killing mutation; MC3a/MC3b exit 5, MC3as/MC3bs exit 1"
+    "source": "npm run mutate 2026-10-20 (Apple M2 Max, 12 cores, Node 22.23.1), the whole registry (50 entries; M05f retired with the operator citation table, M06/M22/M22b/M29 retargeted to the RNG rebuilt from docs/ALGORITHM.md) in one run, baseline verify exit 0, mocha exit 0: 50/50 mutations killed, 28/28 scored steps have a killing mutation; MC3a/MC3b exit 5, MC3as/MC3bs exit 1"
   },
   "pending": ""
 }

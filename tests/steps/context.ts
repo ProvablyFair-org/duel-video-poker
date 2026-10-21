@@ -1,5 +1,16 @@
 import type { VideoPokerBet, SeedEntry, InfoItem } from '../../src/types';
 import type { EpochGroup } from '../../src/loader';
+import { computeFinalHand } from '../../src/rng';
+
+/**
+ * src/rng.ts computeFinalHand, or null where it refuses the holds. The module rebuilt from docs/ALGORITHM.md
+ * (20 Oct 2026) throws on a held card that is not in the dealt hand, or one held twice (the spec leaves that case
+ * open, O7); the former port filled the hand anyway. A step that applies the SERVED holds to a RECOMPUTED or
+ * operator-computed hand must count that as a mismatch, not crash the whole run before its own verdict line.
+ */
+export function finalHandOrNull(initial: readonly string[], held: readonly string[], pool: readonly string[]): string[] | null {
+  try { return computeFinalHand(initial, held, pool); } catch { return null; }
+}
 
 export type { InfoItem };
 

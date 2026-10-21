@@ -96,8 +96,8 @@
   "expect": "[FAIL] Step 6",
   "guard": "VP-06: the client seed must be a genuine HMAC input.",
   "file": "src/rng.ts",
-  "find": "const message = `${clientSeed}:${nonce}:${cursor}`;",
-  "replace": "const message = `fixed:${nonce}:${cursor}`;",
+  "find": "const message = `${clientSeed}:${nonce}:${counter.k}`;",
+  "replace": "const message = `fixed:${nonce}:${counter.k}`;",
   "runner": "verify"
  },
  {
@@ -243,7 +243,7 @@
   "repin": [
    {
     "file": "src/artifact-pins.ts",
-    "find": "db2253dee6cf85e7255c9da2d9f8eddb7dd85c0c54c5290b2db25efeede7e446",
+    "find": "9ebc10764af0954d340fcaa177b28950a320f78118c7d42107d886ca5ef5848a",
     "hashOf": "outputs/simulation-results.json"
    }
   ],
@@ -264,7 +264,7 @@
   "repin": [
    {
     "file": "src/artifact-pins.ts",
-    "find": "db2253dee6cf85e7255c9da2d9f8eddb7dd85c0c54c5290b2db25efeede7e446",
+    "find": "9ebc10764af0954d340fcaa177b28950a320f78118c7d42107d886ca5ef5848a",
     "hashOf": "outputs/simulation-results.json"
    }
   ],
@@ -306,8 +306,8 @@
   "expect": "DRAW BIAS",
   "guard": "VP-08: maxFair must be a whole number of ranges for every range.",
   "file": "src/rng.ts",
-  "find": "  return MAX_UINT32 - (MAX_UINT32 % range);",
-  "replace": "  return MAX_UINT32 - (MAX_UINT32 % range) - 1;",
+  "find": "  return Math.floor(TWO_POW_32 / range) * range;",
+  "replace": "  return Math.floor(TWO_POW_32 / range) * range - 1;",
   "runner": "verify"
  },
  {
@@ -316,7 +316,7 @@
   "expect": "census counted",
   "guard": "VP-08: the census must count every swap.",
   "file": "src/rng.ts",
-  "find": "        if (census) census.swaps++;\n",
+  "find": "    if (census) census.swaps += 1;\n",
   "replace": "",
   "runner": "verify"
  },
@@ -429,8 +429,8 @@
   "expect": "failing",
   "guard": "VP-09: the unit tests recompute captured rounds; a changed shuffle must fail them.",
   "file": "src/rng.ts",
-  "find": "const message = `${clientSeed}:${nonce}:${cursor}`;",
-  "replace": "const message = `${clientSeed}:${nonce + 1}:${cursor}`;"
+  "find": "const message = `${clientSeed}:${nonce}:${counter.k}`;",
+  "replace": "const message = `${clientSeed}:${nonce + 1}:${counter.k}`;"
  },
  {
   "name": "M05d operator Verify-tab capture edited without re-pin",
@@ -464,16 +464,6 @@
   ]
  },
  {
-  "name": "M05f an operator source cite no longer quotes the file",
-  "step": 5,
-  "runner": "verify",
-  "expect": "operator source cites",
-  "guard": "VP-09: every cited line must carry the quoted text.",
-  "file": "src/rng.ts",
-  "find": "{ line: 73, text: 'const j = value % range;'",
-  "replace": "{ line: 72, text: 'const j = value % range;'"
- },
- {
   "name": "M17b a Pass 1 stream count row forged AND the artifact re-pinned",
   "step": 17,
   "runner": "verify",
@@ -489,7 +479,7 @@
   "repin": [
    {
     "file": "src/artifact-pins.ts",
-    "find": "db2253dee6cf85e7255c9da2d9f8eddb7dd85c0c54c5290b2db25efeede7e446",
+    "find": "9ebc10764af0954d340fcaa177b28950a320f78118c7d42107d886ca5ef5848a",
     "hashOf": "outputs/simulation-results.json"
    }
   ]
@@ -510,7 +500,7 @@
   "repin": [
    {
     "file": "src/artifact-pins.ts",
-    "find": "db2253dee6cf85e7255c9da2d9f8eddb7dd85c0c54c5290b2db25efeede7e446",
+    "find": "9ebc10764af0954d340fcaa177b28950a320f78118c7d42107d886ca5ef5848a",
     "hashOf": "outputs/simulation-results.json"
    }
   ]
@@ -531,7 +521,7 @@
   "repin": [
    {
     "file": "src/artifact-pins.ts",
-    "find": "db2253dee6cf85e7255c9da2d9f8eddb7dd85c0c54c5290b2db25efeede7e446",
+    "find": "9ebc10764af0954d340fcaa177b28950a320f78118c7d42107d886ca5ef5848a",
     "hashOf": "outputs/simulation-results.json"
    }
   ]
@@ -552,7 +542,7 @@
   "repin": [
    {
     "file": "src/artifact-pins.ts",
-    "find": "db2253dee6cf85e7255c9da2d9f8eddb7dd85c0c54c5290b2db25efeede7e446",
+    "find": "9ebc10764af0954d340fcaa177b28950a320f78118c7d42107d886ca5ef5848a",
     "hashOf": "outputs/simulation-results.json"
    }
   ]
@@ -583,7 +573,7 @@
   "repin": [
    {
     "file": "src/artifact-pins.ts",
-    "find": "db2253dee6cf85e7255c9da2d9f8eddb7dd85c0c54c5290b2db25efeede7e446",
+    "find": "9ebc10764af0954d340fcaa177b28950a320f78118c7d42107d886ca5ef5848a",
     "hashOf": "outputs/simulation-results.json"
    }
   ]
@@ -604,7 +594,7 @@
   "repin": [
    {
     "file": "src/artifact-pins.ts",
-    "find": "db2253dee6cf85e7255c9da2d9f8eddb7dd85c0c54c5290b2db25efeede7e446",
+    "find": "9ebc10764af0954d340fcaa177b28950a320f78118c7d42107d886ca5ef5848a",
     "hashOf": "outputs/simulation-results.json"
    }
   ]

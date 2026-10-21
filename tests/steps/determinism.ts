@@ -10,11 +10,11 @@
  */
 
 import type { StepResult, VerifyContext } from './context';
-import { step } from './context';
-import { computeShuffledDeck, computeFinalHand } from '../../src/rng';
+import { step, finalHandOrNull } from './context';
+import { computeShuffledDeck } from '../../src/rng';
 import { EXPECTED_BETS, CLIENT_SEED_SAMPLE } from '../../src/loader';
 import { loadSiteVerifier, SITE_VERIFIER_PROVENANCE } from '../../src/site-verifier';
-import { runOperatorVerifier, checkOperatorCites, OPERATOR_EXPECTED_LOGS } from '../../src/operator-verifier';
+import { runOperatorVerifier, OPERATOR_EXPECTED_LOGS } from '../../src/operator-verifier';
 
 export function run(ctx: VerifyContext): StepResult[] {
   const { bets, seedMap } = ctx;
@@ -36,7 +36,7 @@ export function run(ctx: VerifyContext): StepResult[] {
     const deck        = computeShuffledDeck(ss, b.seed.clientSeed, b.seed.nonce);
     const expInitial  = deck.slice(0, 5);
     const expPool     = deck.slice(5, 10);
-    const expFinal    = computeFinalHand(expInitial, b.draw.response.held_cards, expPool);
+    const expFinal    = finalHandOrNull(expInitial, b.draw.response.held_cards, expPool);
 
     const initialMatch = arrEq(expInitial, b.draw.response.initial_cards!);
     const finalMatch   = arrEq(expFinal,   b.draw.response.final_cards!);
@@ -85,20 +85,20 @@ export function run(ctx: VerifyContext): StepResult[] {
   }
   const siteDisagree = siteDiff.initial + siteDiff.final + siteDiff.combination + siteDiff.multiplier;
 
-  // ── DUEL'S OWN VERIFY-TAB CODE (profile VP-09, added 2026-09-26) ──
+  // ── DUEL'S OWN VERIFY-TAB CODE, A SECOND CHECK (profile VP-09, added 2026-09-26) ──
   // evidence/verify-tab/duel-verify-tab-video-poker-2026-04-23.captured.json (pinned, run unedited by
-  // verifier-parity/operator/run-operator-verifier.cjs) is executed on every captured hand. Its first
-  // ten cards must equal src/rng.ts deck[0..9]; its deal must equal the served initial hand; the served
-  // holds applied to its replacement cards must give the served final hand (the operator code has no
-  // hold logic — the hold rule is src/rng.ts computeFinalHand). It must print only its own empty-input
-  // line, and every OPERATOR_SOURCE_CITES line in src/rng.ts must quote it verbatim.
+  // verifier-parity/operator/run-operator-verifier.cjs) is executed on every captured hand. It is not the
+  // source of src/rng.ts (since 20 Oct 2026 rebuilt from docs/ALGORITHM.md by an implementer who never
+  // opened Duel's code); it is run to show it agrees. Its first ten cards must equal src/rng.ts deck[0..9];
+  // its deal must equal the served initial hand; the served holds applied to its replacement cards must
+  // give the served final hand (the operator code has no hold logic — the hold rule is src/rng.ts
+  // computeFinalHand). It must print only its own empty-input line.
   const opRounds: Array<{ id: string; serverSeed: string; clientSeed: string; nonce: number }> = [];
   bets.forEach((b, i) => {
     const ss = seedMap.get(b.seed.serverSeedHashed);
     if (ss) opRounds.push({ id: String(i), serverSeed: ss, clientSeed: b.seed.clientSeed, nonce: b.seed.nonce });
   });
   const op = runOperatorVerifier(opRounds);
-  const cites = checkOperatorCites();
   let opRun = 0;
   const opDiff = { adapter: 0, initial: 0, final: 0 };
   const opFirst: string[] = [];
@@ -112,7 +112,7 @@ export function run(ctx: VerifyContext): StepResult[] {
       const ours = computeShuffledDeck(ss, b.seed.clientSeed, b.seed.nonce).slice(0, 10);
       if (!cards || !arrEq(cards, ours)) { opDiff.adapter++; bad.push('deck[0..9] vs src/rng.ts'); }
       if (!cards || !arrEq(cards.slice(0, 5), b.draw.response.initial_cards!)) { opDiff.initial++; bad.push('initial'); }
-      if (!cards || !arrEq(computeFinalHand(cards.slice(0, 5), b.draw.response.held_cards, cards.slice(5, 10)), b.draw.response.final_cards!)) { opDiff.final++; bad.push('final'); }
+      if (!cards || !arrEq(finalHandOrNull(cards.slice(0, 5), b.draw.response.held_cards, cards.slice(5, 10)), b.draw.response.final_cards!)) { opDiff.final++; bad.push('final'); }
       if (bad.length && opFirst.length < 3) opFirst.push(`hand_id=${b.draw.response.hand_id}: ${bad.join('+')}`);
     });
   }
@@ -122,7 +122,6 @@ export function run(ctx: VerifyContext): StepResult[] {
   else if (opRun !== EXPECTED_BETS) opIssues.push(`operator code ran on ${opRun} != ${EXPECTED_BETS}`);
   if (op.results && JSON.stringify(op.logs) !== JSON.stringify(OPERATOR_EXPECTED_LOGS)) opIssues.push(`operator code printed ${JSON.stringify(op.logs)}`);
   if (opDisagree > 0) opIssues.push(`OPERATOR CODE DISAGREES on ${opDisagree} field(s) (deck vs src/rng.ts ${opDiff.adapter}, initial ${opDiff.initial}, final ${opDiff.final}; first: ${opFirst.join('; ')})`);
-  if (cites.bad.length || cites.checked === 0) opIssues.push(`operator source cites: ${cites.bad.length} of ${cites.checked} do not quote the file (${cites.bad.slice(0, 2).join('; ')})`);
 
   const siteIssues: string[] = [...opIssues];
   if (!site.derive) siteIssues.push(`site verifier not run: ${site.error}`);
@@ -145,20 +144,19 @@ export function run(ctx: VerifyContext): StepResult[] {
         ? `POPULATION MISMATCH vs the capture plan in src/loader.ts: ${s5Issues.join('; ')}`
       : siteIssues.length > 0
         ? `PLAYER VERIFIER: ${siteIssues.join('; ')}`
-        : `All ${EXPECTED_BETS} captured bets recomputed with src/rng.ts, whose RNG code is ported from Duel's published `
-          + `Verify-tab code (E19): the deck shuffle reproduces `
+        : `All ${EXPECTED_BETS} captured bets recomputed with src/rng.ts, rebuilt from the written specification `
+          + `docs/ALGORITHM.md by an implementer who never opened Duel's code: the deck shuffle reproduces `
           + `initial_cards, and the held-card replacement rule applied to deck[5..9] reproduces `
           + `final_cards. 0 skipped, 0 unverifiable, 0 mismatches. The ProvablyFair.org docs-site player `
           + `verifier (derive.js + evaluator.js + paytables.js + lib/hmac-sha256.js, ${SITE_VERIFIER_PROVENANCE.repository} `
           + `${SITE_VERIFIER_PROVENANCE.ref} @ ${SITE_VERIFIER_PROVENANCE.head.slice(0, 7)}, vendored and SHA-256 pinned) run on `
           + `all ${siteRun} bets with their recorded holds: initial hand, final hand, hand rank and multiplier equal the served `
           + `values on every bet (0 differ). Duel's own Verify-tab code (captured 2026-04-23, pinned, run unedited) on all `
-          + `${opRun} hands: its deck[0..9] equals src/rng.ts, its deal equals the served initial hand and, with the served holds, `
-          + `its replacement cards give the served final hand (0 differ); ${cites.checked}/${cites.checked} operator source lines cited in `
-          + `src/rng.ts quote it verbatim.`,
+          + `${opRun} hands, as a second check and not as the source: its deck[0..9] equals src/rng.ts, its deal equals the `
+          + `served initial hand and, with the served holds, its replacement cards give the served final hand (0 differ).`,
     { bets: bets.length, expectedBets: EXPECTED_BETS, recomputed: verified, skipped,
       reconstructedSkipped, mismatches, siteVerifierRun: siteRun, siteVerifierDisagreements: siteDisagree,
-      operatorCodeRun: opRun, operatorCodeDisagreements: opDisagree, operatorCitesChecked: cites.checked },
+      operatorCodeRun: opRun, operatorCodeDisagreements: opDisagree },
   );
 
   // ── Step 6: Client Seed Influence ──────────────────────────────────────────
@@ -202,8 +200,8 @@ export function run(ctx: VerifyContext): StepResult[] {
   return [s5, s6];
 }
 
-function arrEq(a: readonly string[], b: readonly string[]): boolean {
-  if (a.length !== b.length) return false;
+function arrEq(a: readonly string[] | null, b: readonly string[]): boolean {
+  if (a === null || a.length !== b.length) return false;
   for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
   return true;
 }

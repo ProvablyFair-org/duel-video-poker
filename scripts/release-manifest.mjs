@@ -27,12 +27,12 @@ const DECLARED = {
   auditId: 'PF-2026-DL08',
   game: 'video-poker',
   casino: 'duel',
-  release: 'v1.1.0',
+  release: 'v1.2.0',
   framework: '1.1',
   environmentHost: 'duel.com',
   environmentStage: 'production',
   environmentQualifier: null,
-  supersedes: 'v1.0.0',
+  supersedes: 'v1.1.0',
   signature: 'SHA256:gEujiJm2pRyq7lQsfYQfQ1r97H/J7GdaKHbOW8GtikY',
   pending: '',
 };
@@ -68,7 +68,7 @@ function captureWindow(dataset) {
 /** The falsifiability battery. `mutations` is computed from the registry; the RUN RESULT is DECLARED
  * from the last completed `npm run mutate` (cite it in `source`) and must be refreshed by re-running
  * the battery — a generator never asserts a kill it did not run. null = not run for this manifest. */
-const FALSIFIABILITY_DECLARED = { killed: 51, declaredSurvivors: 0, source: 'npm run mutate 2026-10-19 (Apple M2 Max, 12 cores, Node 22.23.1), the whole registry (51 entries, M04c added for the Step 4 nonce-order check) in one run, baseline verify exit 0, mocha exit 0: 51/51 mutations killed, 28/28 scored steps have a killing mutation; MC3a/MC3b exit 5, MC3as/MC3bs exit 1' };
+const FALSIFIABILITY_DECLARED = { killed: 50, declaredSurvivors: 0, source: 'npm run mutate 2026-10-20 (Apple M2 Max, 12 cores, Node 22.23.1), the whole registry (50 entries; M05f retired with the operator citation table, M06/M22/M22b/M29 retargeted to the RNG rebuilt from docs/ALGORITHM.md) in one run, baseline verify exit 0, mocha exit 0: 50/50 mutations killed, 28/28 scored steps have a killing mutation; MC3a/MC3b exit 5, MC3as/MC3bs exit 1' };
 
 /** How long `npm test` takes, and on what — a property of the machine, so DECLARED from measured runs. */
 const RUNTIME = {

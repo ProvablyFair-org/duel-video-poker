@@ -481,14 +481,13 @@ describe('Draw replacement — additional coverage', () => {
   });
 });
 
-// ── Operator source (profile VP-09, added 2026-09-26) ─────────────────────────────────────────────
+// ── Second check: Duel Verify-tab code (profile VP-09, added 2026-09-26) ─────────────────────────────────────────────
 // Duel's own Verify-tab code for Video Poker (captured 2026-04-23, pinned in src/operator-verifier.ts)
-// is EXECUTED unedited on the two pilot rounds above and must print exactly their live cards; every
-// line src/rng.ts cites from it must carry the quoted text.
-import { runOperatorVerifier, checkOperatorCites, OPERATOR_EXPECTED_LOGS } from '../../src/operator-verifier';
-import { OPERATOR_SOURCE_CITES } from '../../src/rng';
+// is EXECUTED unedited on the two pilot rounds above and must print exactly their live cards. It is a
+// second check: src/rng.ts is rebuilt from docs/ALGORITHM.md, not ported from this code.
+import { runOperatorVerifier, OPERATOR_EXPECTED_LOGS } from '../../src/operator-verifier';
 
-describe('Operator source — Duel Verify-tab code', function () {
+describe('Second check — Duel Verify-tab code', function () {
   this.timeout(60_000);
   // the same live pilot seed pair as the RNG block above (declared there inside its describe scope)
   const PILOT_SERVER_SEED = '105bde0af7af90e305027ec61c2408cd48b5f9da7413cfbe652eef5eca68d127';
@@ -503,10 +502,5 @@ describe('Operator source — Duel Verify-tab code', function () {
     assert.deepEqual(run.results!.get('n1'), ['10C', '2D', '3D', '6C', '7C', '2C', '10H', 'KC', '8S', '7D']);
     assert.deepEqual(run.results!.get('n3')!.slice(0, 5), ['7C', '3C', 'AS', '10D', 'JC']);
     assert.deepEqual(run.allCards, [...ALL_CARDS]);
-  });
-  it('every cited operator line quotes the pinned file', () => {
-    const c = checkOperatorCites();
-    assert.equal(c.checked, OPERATOR_SOURCE_CITES.length);
-    assert.deepEqual(c.bad, []);
   });
 });

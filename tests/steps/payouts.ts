@@ -7,9 +7,9 @@
  */
 
 import type { StepResult, VerifyContext } from './context';
-import { step } from './context';
+import { step, finalHandOrNull } from './context';
 import type { HandRank } from '../../src/types';
-import { computeShuffledDeck, computeFinalHand } from '../../src/rng';
+import { computeShuffledDeck } from '../../src/rng';
 import { evaluateHand } from '../../src/hand-evaluator';
 import { EXPECTED_BETS, EXPECTED_PHASE_BETS } from '../../src/loader';
 import videoPokerConfig from '../../videoPokerConfig.json';
@@ -167,8 +167,8 @@ export function run(ctx: VerifyContext): StepResult[] {
 
     const deck       = computeShuffledDeck(ss, b.seed.clientSeed, b.seed.nonce);
     const expInitial = deck.slice(0, 5);
-    const expFinal   = computeFinalHand(expInitial, b.draw.response.held_cards, deck.slice(5, 10));
-    const rank       = evaluateHand(expFinal);
+    const expFinal   = finalHandOrNull(expInitial, b.draw.response.held_cards, deck.slice(5, 10));
+    const rank       = expFinal ? evaluateHand(expFinal) : null;
     const mult       = toUnits(b.draw.response.multiplier);
     const amt        = toUnits(b.deal.request.amount_coins);
     const won        = toUnits(b.draw.response.amount_won);
@@ -207,8 +207,8 @@ export function run(ctx: VerifyContext): StepResult[] {
   return [s7, s8, s9];
 }
 
-function arrEq(a: readonly string[], b: readonly string[]): boolean {
-  if (a.length !== b.length) return false;
+function arrEq(a: readonly string[] | null, b: readonly string[]): boolean {
+  if (a === null || a.length !== b.length) return false;
   for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
   return true;
 }

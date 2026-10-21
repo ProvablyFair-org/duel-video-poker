@@ -15,9 +15,9 @@
 import * as fs   from 'fs';
 import * as path from 'path';
 import type { StepResult, VerifyContext } from './context';
-import { step } from './context';
+import { step, finalHandOrNull } from './context';
 import { evaluateHand } from '../../src/hand-evaluator';
-import { computeShuffledDeck, computeFinalHand, ALL_CARDS, HAND_SIZE, DECK_SIZE, maxFairFor } from '../../src/rng';
+import { computeShuffledDeck, ALL_CARDS, HAND_SIZE, DECK_SIZE, maxFairFor } from '../../src/rng';
 import type { RejectionCensus } from '../../src/rng';
 import type { HandRank, VideoPokerBet } from '../../src/types';
 import { HAND_RANKS } from '../../src/types';
@@ -100,7 +100,7 @@ export function run(ctx: VerifyContext): StepResult[] {
     const deck    = computeShuffledDeck(ss, b.seed.clientSeed, b.seed.nonce);
     const pool    = deck.slice(5, 10);
     const initial = deck.slice(0, 5);
-    const expFinal = computeFinalHand(initial, b.draw.response.held_cards, pool);
+    const expFinal = finalHandOrNull(initial, b.draw.response.held_cards, pool);
 
     if (arrEq(expFinal, b.draw.response.final_cards!)) {
       poolVerified++;
@@ -127,7 +127,7 @@ export function run(ctx: VerifyContext): StepResult[] {
   // Same defect as step 21: an unrevealed seed was `continue`d past uncounted, so the step
   // PASSed with deckValid anywhere from 0 to bets.length. Now counted and bound.
   // DRAW-BIAS BOUND (profile VP-08, added 2026-09-26). Computed from the shuffle's own ceiling
-  // (src/rng.ts maxFairFor): for every range 2 … 52 the accepted domain [0, maxFair) must be a whole
+  // (src/rng.ts maxFairFor, docs/ALGORITHM.md §2 Step 2): for every range 2 … 52 the accepted domain [0, maxFair) must be a whole
   // number of ranges, which makes each swap index exactly uniform — bias 0, below the 2^-32 ceiling.
   // The rejection census over the capture (chunks read vs swaps made) is counted on the same pass.
   const biasIssues: string[] = [];
@@ -174,7 +174,7 @@ export function run(ctx: VerifyContext): StepResult[] {
         ? `DRAW BIAS: ${biasIssues.join('; ')}`
         : `${deckValid}/${EXPECTED_BETS} bets recomputed: deck[0..9] = 10 unique valid cards from the standard `
           + `52-card deck; 0 violations, 0 unrevealed. Draw-bias bound: for every range 2…${DECK_SIZE} the rejection `
-          + `ceiling maxFair = 0xFFFFFFFF − (0xFFFFFFFF mod range) is a whole number of ranges, so every swap index is `
+          + `ceiling maxFair = floor(2^32 / range) × range (docs/ALGORITHM.md §2 Step 2) is a whole number of ranges, so every swap index is `
           + `exactly uniform (bias 0 ≤ 2^-32); worst per-chunk rejection probability ${worstRejectP.toExponential(3)} (range `
           + `${worstRange}). Rejection census over the capture: ${census.swaps} swaps, ${census.chunksRead} chunks read, `
           + `${rejected} rejected.`,
@@ -316,8 +316,8 @@ export function run(ctx: VerifyContext): StepResult[] {
     if (!ss) { phaseEUnrevealed++; continue; }
 
     const deck     = computeShuffledDeck(ss, b.seed.clientSeed, b.seed.nonce);
-    const expFinal = computeFinalHand(deck.slice(0, 5), b.draw.response.held_cards, deck.slice(5, 10));
-    const ourRank  = evaluateHand(expFinal);
+    const expFinal = finalHandOrNull(deck.slice(0, 5), b.draw.response.held_cards, deck.slice(5, 10));
+    const ourRank  = expFinal ? evaluateHand(expFinal) : null;
 
     if (arrEq(expFinal, b.draw.response.final_cards!) && ourRank === b.draw.response.combination) {
       phaseEVerified++;
@@ -500,8 +500,8 @@ function populationIssues(bets: number, recomputed: number, reconstructed: numbe
   return issues;
 }
 
-function arrEq(a: readonly string[], b: readonly string[]): boolean {
-  if (a.length !== b.length) return false;
+function arrEq(a: readonly string[] | null, b: readonly string[]): boolean {
+  if (a === null || a.length !== b.length) return false;
   for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
   return true;
 }

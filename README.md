@@ -1,6 +1,6 @@
 # Duel Video Poker — Provably Fair Audit
 
-**Auditor:** [ProvablyFair.org](https://www.provablyfair.org) · **Audit ID:** PF-2026-DL08 · **Release:** `v1.2.0` · **Capture:** 24 April 2026
+**Auditor:** [ProvablyFair.org](https://www.provablyfair.org) · **Audit ID:** PF-2026-DL08 · **Release:** `v1.2.1` · **Capture:** 24 April 2026
 
 **Result: PROVABLY FAIR — Full Pass.** All 5,400 captured hands reproduce: the shuffled deck, the dealt hand, the replacement pool, the final hand and the payout match recomputation with 0 mismatches. The package's RNG code was rebuilt from a written specification ([docs/ALGORITHM.md](docs/ALGORITHM.md)) by an implementer who never opened Duel's code; Duel's published Verify-tab code ([E19](MANIFEST.md#evidence)) is run as a second check, not used as the source. The verifier reports 27 passing steps out of 28, one disclosed capture-origin flag and no hard failures. The flag concerns two nonces the capture missed on retried requests; it does not identify an operator defect.
 

@@ -1,8 +1,8 @@
 # Duel Video Poker — Consolidated Audit Overview
 
-**Audit ID:** PF-2026-DL08 · **Auditor:** ProvablyFair.org · **Release:** `v1.2.0` · **Framework:** 1.1
+**Audit ID:** PF-2026-DL08 · **Auditor:** ProvablyFair.org · **Release:** `v1.2.1` · **Framework:** 1.1
 
-Audit date: April 2026. Dataset of record: capture on **24 April 2026**, from `2026-04-24T14:46:58.730Z` to `2026-04-24T20:28:08.944Z`. Original publication: 4 June 2026. Game variant: Jacks or Better, 9/6 pay table, on [Duel.com](https://duel.com). Runtime of record: Node 22.x (`package.json` `engines`, `.nvmrc`). Audit report: https://audit.provablyfair.org/casino/duel/games/video-poker/overview. This overview consolidates the package documentation; the machine-readable release identity is in [RELEASE-MANIFEST.json](RELEASE-MANIFEST.json), which is v1.2.0's; v1.1.0's signed release identity is in the `RELEASE-MANIFEST.json` at the `v1.1.0` tag.
+Audit date: April 2026. Dataset of record: capture on **24 April 2026**, from `2026-04-24T14:46:58.730Z` to `2026-04-24T20:28:08.944Z`. Original publication: 4 June 2026. Game variant: Jacks or Better, 9/6 pay table, on [Duel.com](https://duel.com). Runtime of record: Node 22.x (`package.json` `engines`, `.nvmrc`). Audit report: https://audit.provablyfair.org/casino/duel/games/video-poker/overview. This overview consolidates the package documentation; the machine-readable release identity is in [RELEASE-MANIFEST.json](RELEASE-MANIFEST.json), which is v1.2.1's; each earlier release's signed release identity is in the `RELEASE-MANIFEST.json` at that release's tag.
 
 ## Conclusion and scope
 
@@ -579,6 +579,7 @@ The original report's recommendations to the operator, retained as recorded: (1,
 | `v1.0.0` | The original audit. | PROVABLY FAIR — Full Pass |
 | `v1.1.0` | Re-certification under Framework 1.1, October 2026, below. The dataset of record is unchanged. | unchanged |
 | `v1.2.0` | RNG code rebuilt from a written specification, below; Duel's Verify-tab code kept as a second check only. | unchanged |
+| `v1.2.1` | Errata: adds `.gitattributes` (`* -text`) so a Windows git clone keeps every file byte-identical; no audit content changed. | unchanged |
 
 ### v1.2.0 — RNG code rebuilt from a written specification
 
